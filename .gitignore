@@ -40,3 +40,9 @@ vignettes/*.pdf
 
 # Notebook files
 */.ipynb_checkpoints/
+
+# presentations files
+presentations/*/*.nav
+presentations/*/*.bbl
+presentations/*/*.snm
+presentations/*/*.synctex.gz
