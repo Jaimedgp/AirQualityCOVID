@@ -46,3 +46,6 @@ presentations/*/*.nav
 presentations/*/*.bbl
 presentations/*/*.snm
 presentations/*/*.synctex.gz
+
+# Huge amount of data
+data/csv/dataAQV.csv
