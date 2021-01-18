@@ -49,3 +49,10 @@ presentations/*/*.synctex.gz
 
 # Huge amount of data
 data/csv/dataAQV.csv
+
+# Bibliography
+Bibliografia/
+
+# Old files
+./*/old/
+./*/*/old/
