@@ -9,18 +9,18 @@
 suppressMessages(library(saqgetr))
 suppressMessages(library(lubridate))
 
-get.countData.AQ <- function(sitesAQ.fl = "../data/csv/sitesAQ.csv"
+get.countData.AQ <- function(sitesAQ.fl = "../data/csv/sitesAQ.csv",
                              dataAQ.fl = "../data/csv/dataAQ.csv",
-                             final.fl = "../data/csv/final_sites.csv"){
-    # contaminantes a estudiar
-    pollutants <- c("no", "no2", "o3", "pm10")
+                             final.fl = "../data/csv/final_sites.csv",
 
-    # fechas de inicio y final de toma de datos
-    start_dt <- ymd_hms("2015-01-01 00:00:00")
-    end_dt <- ymd_hms("2020-10-01 00:00:00")
+                             pollutants = c("no", "no2", "o3", "pm10"), # contaminantes a estudiar
+                             start_dt = ymd_hms("2015-01-01 00:00:00"), # fechas de inicio de toma de datos
+                             end_dt = ymd_hms("2020-12-31 00:00:00"), # fechas de final de toma de datos
+                             lckdwn_strt = ymd_hms("2020-03-14 00:00:00"), # fecha de inicio de confinamiento
 
-    # fecha de inicio de confinamiento
-    lckdwn_strt <- ymd_hms("2020-03-14 00:00:00")
+                             save.data = TRUE
+                            ){
+
 
 
     if (file.exists(sitesAQ.fl)) {
@@ -29,20 +29,24 @@ get.countData.AQ <- function(sitesAQ.fl = "../data/csv/sitesAQ.csv"
         if (file.exists(dataAQ.fl)) {
             data <- read.csv(dataAQ.fl)
         } else {
-            suppressMessages(data <- get_saq_observations(
-                site = levels(sites$site),
-                variable = pollutants,
-                valid_only = TRUE,
-                start = start_dt,
-                end = end_dt,
-                verbose = TRUE
-            ))
+            data <- get_saq_observations(site = levels(sites$site),
+                                         variable = pollutants,
+                                         valid_only = TRUE,
+                                         start = start_dt,
+                                         end = end_dt,
+                                         verbose = TRUE
+                                        )
+
+            if (save.data) {
+                write.csv(data, dataAQ.fl, row.names=FALSE)
+
+                split.by.site(data, site.lv="all", folder="../data/dataAQ/")
         }
 
         numCount <- c()
 
         for (st in levels(sites$site)) {
-            numCount <- c(numCount, nrow(dataAQV[dataAQV$site == st, ]))
+            numCount <- c(numCount, nrow(data[data$site == st, ]))
         }
 
         final.info.sites <- data.frame(siteAQ=levels(sites$site),
@@ -62,5 +66,48 @@ get.countData.AQ <- function(sitesAQ.fl = "../data/csv/sitesAQ.csv"
 
     } else {
         print("Something went wrong")
+        final.info.sites <- 0
     }
 
+    data
+}
+
+
+get.countData.Mto <- function(sitesMto.fl = "../data/csv/sitesMto.csv",
+                              dataMto.fl = "../data/csv/dataMto.csv",
+                              final.fl = "../data/csv/final_sites.csv",
+
+                              pollutants = c("no", "no2", "o3", "pm10"), # contaminantes a estudiar
+                              start_dt = ymd_hms("2015-01-01 00:00:00"), # fechas de inicio de toma de datos
+                              end_dt = ymd_hms("2020-12-31 00:00:00"), # fechas de final de toma de datos
+                              lckdwn_strt = ymd_hms("2020-03-14 00:00:00"), # fecha de inicio de confinamiento
+
+                              save.data = TRUE
+                             ){
+
+
+
+    if (file.exists(sitesMto.fl)) {
+        sites <- read.csv(sitesMto.fl, stringsAsFactors=T)
+
+        if (file.exists(dataMto.fl)) {
+            data <- read.csv(dataMto.fl)
+        } else {
+            # Get Data from worlmet
+        }
+
+
+        if (file.exists(file)) {
+            final.sites <- read.csv(file)
+
+        } else {
+            write.csv(final.info.sites, file, row.names=FALSE)
+        }
+
+    } else {
+        print("Something went wrong")
+        final.info.sites <- 0
+    }
+
+    data
+}

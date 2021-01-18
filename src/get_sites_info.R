@@ -18,10 +18,11 @@ source("../src/open_data.R")
 
 get.sitesAQ.info <- function(file="../data/xlsx/estaciones-CA-JA.xlsx",
                              sheet="ciudades-100000-A",
+                             site_type = "traffic",
+                             pollutants = c("no", "no2", "o3", "pm10"),
                              start_dt = ymd_hms("2010-01-01 00:00:00"),
                              end_dt = ymd_hms("2020-10-01 00:00:00"),
-                             site_type = "traffic",
-                             pollutants = c("no", "no2", "o3", "pm10")
+                             save=TRUE
                             ) {
 
     if (file.exists(file)) {
@@ -65,10 +66,8 @@ get.sitesAQ.info <- function(file="../data/xlsx/estaciones-CA-JA.xlsx",
     sites
 }
 
-}
 
-
-get.sitesMto.info <- function(nearest=3){
+get.sitesMto.info <- function(nearest=3, save=TRUE){
     # Function to obtain the information about the three closest meteo sites
     # from air quality sites
 
