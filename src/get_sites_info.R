@@ -6,6 +6,16 @@
 # @author Jaimedgp
 ##
 
+# libraries for AQ
+suppressMessages(library(saqgetr))
+suppressMessages(library(tidyverse))
+suppressMessages(library(lubridate))
+
+# libraries for Mto
+suppressMessages(library(worldmet))
+source("../src/open_data.R")
+
+
 get.sitesAQ.info <- function(file="../data/xlsx/estaciones-CA-JA.xlsx",
                              sheet="ciudades-100000-A",
                              start_dt = ymd_hms("2010-01-01 00:00:00"),
