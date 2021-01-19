@@ -1,3 +1,0 @@
-"site","process","variable","variable_long","period","unit","observation_count","Municipio","Población","Estación tráfico","site_name","latitude","longitude","elevation","country","site_type","site_area","date_start","date_end"
-"es0041a",31140,"no2","Nitrogen dioxide (air)","day","ug.m-3",151,"Bilbao",346843,"María Diaz de Haro","DIRECCIÓN DE SALUD",43.25883,-2.94565,32,"spain","traffic","urban",1986-04-01,2021-01-15 23:00:00
-"es0110a",31281,"o3","Ozone (air)","day","ug.m-3",4092,"Bilbao",24350,"Erandio","ERANDIO",43.30268,-2.97724,4,"spain","traffic","urban",1997-01-01,2021-01-15 23:00:00
