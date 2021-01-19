@@ -1,14 +1,29 @@
-split.by.site <- function(df, site.lv="all", folder="../data/dataAQ/"){
+split.by.site <- function(df, site.lv="all", folder="../data/csv/dataAQ/"){
 
-    if (site.lv == "all") {
-        site.lv <- levels(as.factor(df$site))
-    }
+    if (folder == "../data/csv/dataAQ/") {
+        if (site.lv == "all") {
+            site.lv <- levels(as.factor(df$site))
+        }
 
-    for (st in site.lv) {
-        write.csv(df[df$site == st, ],
-                  paste(folder, st, ".csv", sep=""),
-                  row.names=FALSE
-                 )
+        for (st in site.lv) {
+            write.csv(df[df$site == st, ],
+                    paste(folder, st, ".csv", sep=""),
+                    row.names=FALSE
+                    )
+        }
+    } else if (folder == "../data/csv/dataMto/") {
+        if (site.lv == "all") {
+            site.lv <- levels(as.factor(df$code))
+        }
+
+        for (st in site.lv) {
+            write.csv(df[df$code == st, ],
+                    paste(folder, st, ".csv", sep=""),
+                    row.names=FALSE
+                    )
+        }
+    } else {
+        print("Something went wrong")
     }
 }
 
