@@ -1,5 +1,5 @@
 source("./get_sites_info.R")
-source("./count_AQ_data.R")
+source("./count_data.R")
 source("./funciones.R")
 
 save.all <- TRUE
