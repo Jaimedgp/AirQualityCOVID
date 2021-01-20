@@ -1,7 +1,6 @@
 ##
 # Script with R function to obtain how many data of air quality and meteo
-# sites are available. This script is equivalent of notebooks "notebooks/countAQdata.ipynb"
-# and "notebooks/countMtodata.ipynb"
+# sites are available. This script is equivalent of notebook "notebooks/countdata.ipynb"
 #
 # @author Jaimedgp
 ##
@@ -24,7 +23,7 @@ get.countData.AQ <- function(sitesAQ.fl = "../data/csv/sitesAQ.csv",
 
 
     if (file.exists(sitesAQ.fl)) {
-        sites <- read.csv(sitesAQ.fl, stringsAsFactors=T)[1:2]
+        sites <- read.csv(sitesAQ.fl, stringsAsFactors=T)
 
         if (file.exists(dataAQ.fl)) {
             data <- read.csv(dataAQ.fl)

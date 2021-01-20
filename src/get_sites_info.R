@@ -57,7 +57,7 @@ get.sitesAQ.info <- function(file="../data/xlsx/estaciones-CA-JA.xlsx",
 
         # Merge all dataframes with the main information of each air quality stations
         sites <- merge(x = sites.info, y = sites.geo, by = "site", all.x = TRUE)
-        sites <- merge(x = sites, y = spain.sites, by = "site", all.x = TRUE)[1:2,]
+        sites <- merge(x = sites, y = spain.sites, by = "site", all.x = TRUE)
 
     } else {
         print("No spain sites file")
@@ -74,11 +74,11 @@ get.sitesMto.info <- function(nearest=3, save=TRUE){
     sites <- read.csv("../data/csv/sitesAQ.csv")
 
     sites.mto <- data.frame() # Initialize sites.mto dataframe
-    sites.lv <- levels(as.factor(sites$site))[1:2] # get sitesAQ codes
+    sites.lv <- levels(as.factor(sites$site)) # get sitesAQ codes
 
     for (i in 1:length(sites.lv)) {
-        mto <- getMeta(lat = sites[sites$site == sites.lv[i], ]$latitude,
-                       lon = sites[sites$site == sites.lv[i], ]$longitude,
+        mto <- getMeta(lat = sites[sites$site == sites.lv[i], ]$latitude[1],
+                       lon = sites[sites$site == sites.lv[i], ]$longitude[1],
                        end.year = "current",
                        n = 3, returnMap = F)
         mto$siteAQ <- sites.lv[i]
