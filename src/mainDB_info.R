@@ -1,3 +1,11 @@
+##
+# Script with R function to create a table with the relevant information of
+# each station (AQ and meteo) with the n-n relation between each. This script
+# is equivalent of notebooks "notebooks/mainDB_info.ipynb"
+# and "notebooks/sitesMto.ipynb"
+#
+# @author Jaimedgp
+##
 source("./get_sites_info.R")
 source("./count_data.R")
 source("./funciones.R")
