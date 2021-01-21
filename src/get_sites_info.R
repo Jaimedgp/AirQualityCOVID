@@ -1,6 +1,6 @@
 ##
 # Script with R function to obtain the information of air quality and meteo
-# sites. This script is equivalent of notebooks "notebooks/sitesAQ.ipynb"
+# sites. This script is equivalent of notebooks "notebooks/mainDB_info.ipynb"
 # and "notebooks/sitesMto.ipynb"
 #
 # @author Jaimedgp

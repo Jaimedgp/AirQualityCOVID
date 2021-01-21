@@ -1,6 +1,6 @@
 ##
 # Script with R function to obtain how many data of air quality and meteo
-# sites are available. This script is equivalent of notebook "notebooks/countdata.ipynb"
+# sites are available. This script is equivalent of notebook "notebooks/mainDB_ info.ipynb"
 #
 # @author Jaimedgp
 ##
