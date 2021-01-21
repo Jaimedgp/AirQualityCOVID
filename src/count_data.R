@@ -20,13 +20,11 @@ get.countData.AQ <- function(sitesAQ.fl = "../data/csv/sitesAQ.csv",
                              save.data = TRUE
                             ){
 
-
-
     if (file.exists(sitesAQ.fl)) {
         sites <- read.csv(sitesAQ.fl, stringsAsFactors=T)
 
         if (file.exists(dataAQ.fl)) {
-            data <- read.csv(dataAQ.fl)
+            data <- read.csv(dataAQ.fl, stringsAsFactors=T)
         } else {
             data <- get_saq_observations(site = levels(sites$site),
                                          variable = pollutants,
@@ -35,6 +33,8 @@ get.countData.AQ <- function(sitesAQ.fl = "../data/csv/sitesAQ.csv",
                                          end = end_dt,
                                          verbose = TRUE
                                         )
+            # Convert charactes into factors
+            data <- mutate_if(data, is.character, as.factor)
 
             # Save data in a file for each station
             if (save.data) {
@@ -55,6 +55,8 @@ get.countData.AQ <- function(sitesAQ.fl = "../data/csv/sitesAQ.csv",
         nn.sitesAQ <- data.frame(siteAQ = levels(sites$site),
                                  countAQ = numCount)
         rm(data, numCount)
+        # Convert charactes into factors
+        nn.sitesAQ <- mutate_if(nn.sitesAQ, is.character, as.factor)
     } else {
         print("Something went wrong")
         nn.sitesAQ <- 0
@@ -75,7 +77,7 @@ get.countData.Mto <- function(sitesMto.fl = "../data/csv/sitesMto.csv",
         sites <- read.csv(sitesMto.fl, stringsAsFactors=T)
 
         if (file.exists(dataMto.fl)) {
-            data <- read.csv(dataMto.fl)
+            data <- read.csv(dataMto.fl, stringsAsFactors=T)
         } else {
             # Get Data from worlmet
             data <- importNOAA(code = levels(sites$code),
@@ -85,6 +87,8 @@ get.countData.Mto <- function(sitesMto.fl = "../data/csv/sitesMto.csv",
                                quiet = FALSE,
                                path = NA
                               )
+            # Convert charactes into factors
+            data <- mutate_if(data, is.character, as.factor)
 
             # Save data in a file for each station
             if (save.data) {
@@ -101,7 +105,7 @@ get.countData.Mto <- function(sitesMto.fl = "../data/csv/sitesMto.csv",
         #-----------------------
         countMto <- NA
         siteMto <- NA
-        code.lv <- levels(as.factor(data$code))
+        code.lv <- levels(data$code)
 
         for (i in 1:length(code.lv)) {
             siteMto <- rbind(siteMto, code.lv[i])
@@ -136,6 +140,8 @@ get.countData.Mto <- function(sitesMto.fl = "../data/csv/sitesMto.csv",
                                  by = "siteMto", all=TRUE
                                 )
         rm(data, countMto, sites, siteMto)
+        # Convert charactes into factors
+        nn.sitesMto <- mutate_if(nn.sitesMto, is.character, as.factor)
     } else {
         print("Something went wrong")
         nn.sitesMto <- 0
@@ -151,6 +157,8 @@ get.nnSites <- function(sitesMto, sitesAQ,
     nn.sites <- merge(x = sitesAQ,
                       y = sitesMto,
                       by = "siteAQ", all = TRUE)
+    # Convert charactes into factors
+    nn.sites <- mutate_if(nn.sites, is.character, as.factor)
 
     write.csv(nn.sites, final.fl, row.names=FALSE)
 }

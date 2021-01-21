@@ -59,6 +59,9 @@ get.sitesAQ.info <- function(file="../data/xlsx/estaciones-CA-JA.xlsx",
         sites <- merge(x = sites.info, y = sites.geo, by = "site", all.x = TRUE)
         sites <- merge(x = sites, y = spain.sites, by = "site", all.x = TRUE)
 
+        # Convert charactes into factors
+        sites <- mutate_if(sites, is.character, as.factor)
+
     } else {
         print("No spain sites file")
     }
@@ -71,10 +74,10 @@ get.sitesMto.info <- function(nearest=3, save=TRUE){
     # Function to obtain the information about the three closest meteo sites
     # from air quality sites
 
-    sites <- read.csv("../data/csv/sitesAQ.csv")
+    sites <- read.csv("../data/csv/sitesAQ.csv", stringsAsFactors=TRUE)
 
     sites.mto <- data.frame() # Initialize sites.mto dataframe
-    sites.lv <- levels(as.factor(sites$site)) # get sitesAQ codes
+    sites.lv <- levels(sites$site) # get sitesAQ codes
 
     for (i in 1:length(sites.lv)) {
         mto <- getMeta(lat = sites[sites$site == sites.lv[i], ]$latitude[1],
@@ -84,6 +87,9 @@ get.sitesMto.info <- function(nearest=3, save=TRUE){
         mto$siteAQ <- sites.lv[i]
         sites.mto <- rbind(sites.mto, mto)
     }
+
+    # Convert charactes into factors
+    sites <- mutate_if(sites, is.character, as.factor)
 
     write.csv(sites.mto, "../data/csv/sitesMto.csv", row.names=FALSE)
     sites.mto
