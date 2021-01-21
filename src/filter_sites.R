@@ -56,13 +56,13 @@ order.all <- function(sites){
 }
 
 
-relevant.sites <- function(sites,
+relevant.sites <- function(sites.fl="../data/csv/nn_sites.csv",
                            cols=1:12,
                            minValue=0.0,
                            percent=0.7,
                            numVar=7){
 
-    nn.sites <- read.csv("../data/csv/nn_sites.csv")
+    nn.sites <- read.csv(sites.fl)
 
     sites.row <- filter.row(sites = nn.sites[, cols],
                             minValue = minValue)
