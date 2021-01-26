@@ -54,6 +54,17 @@ get.countData.AQ <- function(sitesAQ.fl = "../data/csv/sitesAQ.csv",
 
         nn.sitesAQ <- data.frame(siteAQ = levels(sites$site),
                                  countAQ = numCount)
+
+        # Se anhaden los municipios a los que pertenece cada
+        # estacion dentro de la informacion relevante
+        municipios <- data.frame()
+
+        for (i in 1:nrow(nn.sitesAQ)) {
+            municipios[i, "Municipio"] <- sites[nn.sitesAQ[i, "siteAQ"] == sites$site,][, "Municipio"][1]
+        }
+        nn.sitesAQ <- cbind(municipios, nn.sitesAQ)
+        #-------------------------------------------------------
+
         rm(data, numCount)
         # Convert charactes into factors
         nn.sitesAQ <- mutate_if(nn.sitesAQ, is.character, as.factor)
