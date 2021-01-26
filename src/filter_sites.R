@@ -9,7 +9,6 @@
 
 
 filter.row <- function(sites, minValue=0.0){
-
     new.sites <- c()
 
     for (i in 1:nrow(sites)) {
@@ -56,11 +55,28 @@ order.all <- function(sites){
 }
 
 
+unique.cities <- function(sites){
+    new.sites <- data.frame()
+    municipios <- levels(as.factor(sites[, "Municipio"]))
+
+    for (i in 1:length(municipios)) {
+        sm.city <- sites[sites$Municipio == municipios[i], ]
+
+        new.sites <- rbind(new.sites,
+                           sm.city[which.max(sm.city$countAQ), ]
+                          )
+    }
+
+    new.sites
+}
+
+
 relevant.sites <- function(sites.fl="../data/csv/nn_sites.csv",
                            cols=1:12,
                            minValue=0.0,
                            percent=0.7,
-                           numVar=7){
+                           numVar=7,
+                           unique.cty=TRUE){
 
     nn.sites <- read.csv(sites.fl)
 
@@ -68,8 +84,11 @@ relevant.sites <- function(sites.fl="../data/csv/nn_sites.csv",
                             minValue = minValue)
     sites.percent <- filter.percent(sites = sites.row,
                                     percent = percent)
-    sites.order <- filter.order(sites = sites.percent,
+    sites <- filter.order(sites = sites.percent,
                                 numVar = numVar)
+    if (unique.cty) {
+        sites <- unique.cities(sites)
+    }
 
-    order.all(sites = sites.order)
+    order.all(sites = sites)
 }
