@@ -28,13 +28,11 @@ split.by.site <- function(df, site.lv="all", folder="../data/csv/dataAQ/"){
 }
 
 
-pivot.by.pollut <- function(df, pollutants, by="day", site="default") {
+pivot.by.pollut <- function(df, pollutants, by="day", site="default", FUN="mean") {
     pivoted.df <- lapply(pollutants,function(pll) {
 
         new.data <- subset(df, variable == pll)
-
-        new.data$date <- round_date(ymd_hms(new.data$date), unit=by)
-        new.data <- aggregate(value ~ date + site, new.data, mean)
+        new.data <- group.by.date(new.data, by=by, FUN=FUN)
 
         names(new.data)[names(new.data) == "value"] <- pll
         new.data[, c("date", "site", pll)]
@@ -62,7 +60,16 @@ pivot.by.pollut <- function(df, pollutants, by="day", site="default") {
 
 
 group.by.date <- function(df, by="day", FUN="mean") {
-    df$date <- round_date(ymd_hms(df$date), unit=by)
+    if (by == "jaime") {
+        df$date <- round_date(ymd_hms(df$date), unit="8hours")
+        df <- aggregate(value ~ date + site + variable + unit, df, FUN)
+        
+        df$date <- round_date(ymd_hms(df$date), unit="day")
+        FUN <- "max"
+        
+    } else {
+        df$date <- round_date(ymd_hms(df$date), unit=by)
+    }
 
     aggregate(value ~ date + site + variable + unit, df, FUN)
 }
