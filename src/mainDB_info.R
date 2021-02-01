@@ -15,9 +15,9 @@ save.all <- TRUE
 sitesAQ <- get.sitesAQ.info(file="../data/xlsx/estaciones-CA-JA.xlsx",
                             sheet="ciudades-100000-A",
                             site_type = "traffic",
-                            pollutants = c("no", "no2", "o3", "pm10"),
+                            pollutants = c("no", "no2", "o3", "pm10", "pm2.5"),
                             start_dt = ymd_hms("2010-01-01 00:00:00"),
-                            end_dt = ymd_hms("2020-10-01 00:00:00"),
+                            end_dt = ymd_hms("2020-12-31 00:00:00"),
                             save=save.all
                            )
 print("sitesAQ Done!")
@@ -29,10 +29,9 @@ print("sitesMto Done!")
 nn.sitesAQ <- get.countData.AQ(sitesAQ.fl = "../data/csv/sitesAQ.csv",
                                dataAQ.fl = "../data/csv/dataAQ.csv",
 
-                               pollutants = c("no", "no2", "o3", "pm10"), # contaminantes
-                               start_dt = ymd_hms("2015-01-01 00:00:00"), # fecha inicio
+                               pollutants = c("no", "no2", "o3", "pm10", "pm2.5"), # contaminantes
+                               start_dt = ymd_hms("2010-01-01 00:00:00"), # fecha inicio
                                end_dt = ymd_hms("2020-12-31 00:00:00"), # fecha final
-                               lckdwn_strt = ymd_hms("2020-03-14 00:00:00"), # fecha confinamiento
 
                                save.data = save.all
                               )
