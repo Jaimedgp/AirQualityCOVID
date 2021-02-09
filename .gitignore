@@ -40,6 +40,9 @@ vignettes/*.pdf
 
 # Notebook files
 */.ipynb_checkpoints/
+*/*/.ipynb_checkpoints/
+*/*/*/.ipynb_checkpoints/
+*/*/*/*/.ipynb_checkpoints/
 
 # presentations files
 presentations/*/*.nav
