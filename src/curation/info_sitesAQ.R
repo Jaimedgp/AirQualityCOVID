@@ -60,7 +60,13 @@ get.missing <- function(dataFrame, unit="week",
                        )
                / conversion[[unit]])
 
-    as.integer(period) - sum(!is.na(new.df$x)) + 1
+
+    amount <- as.integer(period) - sum(!is.na(new.df$x))
+    if (amount == -1) {
+        amount + 1
+    } else {
+        amount
+    }
 }
 
 
@@ -117,7 +123,7 @@ if(!interactive()) {
     all.sites <- read.csv("data/curation/sitesAQ.csv",
                       stringsAsFactor=TRUE)
     sites.lv <- levels(all.sites$site)[1:2]
-    pollutants.lv <- levels(all.sites$variable)
+    pollutants.lv <- c("no", "no2", "o3", "pm10", "pm2.5")
 
 
     all.info <- main(sites.lv, pollutants.lv,
