@@ -20,32 +20,16 @@ source("src/general.R")
 
 get.info <- function(column, dataFrame) {
     new.df <- dataFrame[, c("date", column)]
+    new.df$date <- as.numeric(new.df$date)
     new.df <- new.df[complete.cases(new.df),]
 
-    resolutions <- c()
 
-    for (i in 1:(nrow(new.df)-1)) {
-        resolutions <- c(resolutions,
-                         interval(new.df$date[i],
-                                  new.df$date[i+1]) /3600
-                        )
-    }
+    resolutions <- apply(new.df[-2], 2, diff) / 3600
 
-    if (!is.na(min(resolutions)) & min(resolutions) > 24) {
-        resol <- NA
-        amount <- sum(!is.na(dataFrame[, column])) / nrow(dataFrame[, column])
-    } else {
-        resol <- min(resolutions)
-        amount <- resol * sum(!is.na(dataFrame[, column])) / nrow(dataFrame[, column])
-    }
+    resol <- min(resolutions)
+    amount <- resol * sum(!is.na(dataFrame[, column])) / nrow(dataFrame[, column])
 
     c(resol, amount)
-
-}
-
-
-get.amount <- function(dataFrame, column, resolution) {
-    resolution * sum(!is.na(dataFrame[, column])) / nrow(dataFrame[, column])
 }
 
 
@@ -60,38 +44,45 @@ main <- function(sites.lv, years) {
 
     all.resolution <- data.frame()
     all.amount <- data.frame()
+    i <- 1
 
     for (st in sites.lv) {
         # Get Data from worlmet
         dataMto <- importNOAA(code = st,
                             year = years,
                             hourly = TRUE,
-                            n.cores = 6
+                            n.cores = 9
                             )
 
         new.row <- data.frame(site = st,
-                            start_dt = as_date(min(dataMto$date)),
-                            end_dt = as_date(max(dataMto$date))
-                            )
+                              start_dt = as_date(min(dataMto$date)),
+                              end_dt = as_date(max(dataMto$date))
+                              )
 
-        info.apply <- lapply(names(dataMto)[-(1:7)], get.info, dataFrame=dataMto)
-        info.df <- data.frame(info.apply)
-        names(info.df) <- names(dataMto)[-(1:7)]
+        nm <- names(dataMto)[-(1:6)]
+        if ("pwc" %in% nm) {
+            nm <- nm[-which(nm == "pwc")]
+        }
+
+        info.df <- data.frame(lapply(nm, get.info, dataFrame=dataMto))
+        names(info.df) <- nm
 
         resolution.row <- cbind(new.row, info.df[1,])
         amount.row <- cbind(new.row, info.df[2,])
 
-        for (cl in variables[-which(variables %in% names(dataMto))]) {
+        for (cl in variables[-which(variables %in% nm)]) {
             resolution.row[, cl] <- 0
             amount.row[, cl] <- 0
         }
 
         all.resolution <- rbind(resolution.row, all.resolution)
         all.amount <- rbind(amount.row, all.amount)
+
+        print(paste(i, length(sites.lv), sep="/"))
+        i <- i+1
     }
 
-    list(resolution=all.resolution,
-         amount=all.amount)
+    list(all.resolution, all.amount)
 }
 
 
@@ -102,12 +93,12 @@ if(!interactive()) {
     # Get sites of study
     all.sites <- read.csv("data/curation/sitesMto.csv",
                           stringsAsFactor=TRUE)
-    sites.lv <- levels(all.sites$site)[1:2]
+    sites.lv <- levels(all.sites$code)
 
     all.info <- main(sites.lv, years)
 
-    write.csv(all.info["resolution"],
+    write.csv(all.info[1],
               "data/curation/info_sitesMto_resolution.csv", row.names=FALSE)
-    write.csv(all.info["amount"],
+    write.csv(all.info[2],
               "data/curation/info_sitesMto_amount.csv", row.names=FALSE)
 }

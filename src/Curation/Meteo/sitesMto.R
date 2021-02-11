@@ -20,7 +20,7 @@ sitesAQ <- read.csv("data/curation/sitesAQ.csv",
                     stringsAsFactor=TRUE)
 
 sitesMto <- data.frame()
-sites.lv <- levels(sitesAQ$site)[1:2]
+sites.lv <- levels(sitesAQ$site)
 
 for (i in 1:length(sites.lv)) {
     mto <- getMeta(lat = sitesAQ[sitesAQ$site == sites.lv[i], ]$latitude,
@@ -29,6 +29,8 @@ for (i in 1:length(sites.lv)) {
                    n = 3, returnMap = F)
     mto$siteAQ <- sites.lv[i]
     sitesMto <- rbind(sitesMto, mto[mto$begin < "2015-01-01", ])
+
+    print(paste(i, length(sites.lv), sep="/"))
 }
 
 # Guardar Datos en csv

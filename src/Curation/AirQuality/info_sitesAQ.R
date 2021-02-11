@@ -62,17 +62,14 @@ get.missing <- function(dataFrame, unit="week",
 
 
     amount <- as.integer(period) - sum(!is.na(new.df$x))
-    if (amount == -1) {
-        amount + 1
-    } else {
-        amount
-    }
+    amount + 1
 }
 
 
 main <- function(sites.lv, pollutants.lv,
                  min.interval, start_dt, end_dt, data.fldr) {
     all.info <- data.frame()
+    i <- 1
 
     for (st in sites.lv) {
         for (pll in pollutants.lv) {
@@ -103,10 +100,10 @@ main <- function(sites.lv, pollutants.lv,
                                       hv.min, mss.wk, mss.mnth, mss.yr)
                 all.info <- rbind(new.row, all.info)
             }
-            print(paste(st, pll, sep=" : "))
         }
+        print(paste(i, length(sites.lv), sep="/"))
+        i <- i+1
     }
-
     all.info
 }
 
@@ -122,7 +119,7 @@ if(!interactive()) {
     # Get sites of study
     all.sites <- read.csv("data/curation/sitesAQ.csv",
                       stringsAsFactor=TRUE)
-    sites.lv <- levels(all.sites$site)[1:2]
+    sites.lv <- levels(all.sites$site)
     pollutants.lv <- c("no", "no2", "o3", "pm10", "pm2.5")
 
 
