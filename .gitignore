@@ -51,8 +51,8 @@ presentations/*/*.snm
 presentations/*/*.synctex.gz
 
 # Huge amount of data
-data/curation/data*/*.csv
-data/curation/data*.csv
+data/Curation/data*/*.csv
+data/Curation/data*.csv
 
 # Bibliography
 Bibliografia/
