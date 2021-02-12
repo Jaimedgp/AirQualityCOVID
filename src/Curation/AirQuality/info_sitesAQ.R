@@ -62,7 +62,7 @@ get.missing <- function(dataFrame, unit="week",
 
 
     amount <- as.integer(period) - sum(!is.na(new.df$x))
-    amount + 1
+    amount
 }
 
 
