@@ -32,7 +32,7 @@ group.by.date <- function(df, unit="day", FUN="mean") {
 }
 
 
-get.AQdata <- function(site="", pollutant, start_dt,
+get.AQdata <- function(site="", pollutant, start_dt, end_dt,
                        data.by.file=FALSE, fileName="../data/curation/dataAQ/") {
     # Obtain air quiality data of site station.
     #
@@ -49,7 +49,7 @@ get.AQdata <- function(site="", pollutant, start_dt,
                              read.csv(fl, stringsAsFactor=FALSE) %>%
                                 filter(variable %in% pollutant) %>%
                                 date.as.datetime() %>%
-                                filter(year(date) >= start_dt)
+                                filter(year(date) >= start_dt & year(date) <= end_dt)
                             )
         }
     } else {
@@ -57,6 +57,7 @@ get.AQdata <- function(site="", pollutant, start_dt,
             site = site,
             variable = pollutant,
             start = start_dt,
+            end = end_dt,
             valid_only = TRUE,
             verbose = TRUE
         ))
