@@ -75,8 +75,9 @@ main <- function(sites.lv, pollutants.lv,
         for (pll in pollutants.lv) {
 
             # Obtain dataframe
-            dataAQPLL <- get.AQdata(site=st, pollutant=pll, start_dt = start_dt,
-                       data.by.file=TRUE, fileName=data.fldr)
+            dataAQPLL <- get.AQdata(site=st, pollutant=pll,
+                                    start_dt = start_dt, end_dt=end_dt,
+                                    data.by.file=TRUE, fileName=data.fldr)
 
             if (nrow(dataAQPLL) > 0) {
                 start_yr <- as_date(min(dataAQPLL$date))
@@ -117,7 +118,7 @@ if(!interactive()) {
     end_dt <- ymd("2020-12-30")
 
     # Get sites of study
-    all.sites <- read.csv("data/curation/sitesAQ.csv",
+    all.sites <- read.csv("data/Curation/sitesAQ.csv",
                       stringsAsFactor=TRUE)
     sites.lv <- levels(all.sites$site)
     pollutants.lv <- c("no", "no2", "o3", "pm10", "pm2.5")
@@ -125,8 +126,8 @@ if(!interactive()) {
 
     all.info <- main(sites.lv, pollutants.lv,
                      min.interval, start_dt, end_dt,
-                     data.fldr="data/curation/dataAQ/"
+                     data.fldr="data/Curation/dataAQ/"
                      )
 
-    write.csv(all.info, "data/curation/info_sitesAQ.csv", row.names=FALSE)
+    write.csv(all.info, "data/Curation/info_sitesAQ.csv", row.names=FALSE)
 }
