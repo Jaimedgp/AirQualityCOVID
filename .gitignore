@@ -60,3 +60,8 @@ Bibliografia/
 # Old files
 ./*/old/
 ./*/*/old/
+
+# Python packages
+src/*/__pycache__/
+src/*/*/__pycache__/
+src/*/*/*/__pycache__/
