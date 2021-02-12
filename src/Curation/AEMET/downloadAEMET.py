@@ -15,6 +15,36 @@ import pandas as pd
 from dateutil.relativedelta import relativedelta
 
 
+def convert_long(longitude):
+    """ Convert AEMET longitude notation into float number
+
+        E -> +       |    W -> -
+    """
+
+    for i in range(0, longitude.shape[0]):
+        if "E" in longitude.iloc[i]:
+            longitude.iloc[i] = longitude.iloc[i][:-1]
+        elif "W" in longitude.iloc[i]:
+            longitude.iloc[i] = "-"+longitude.iloc[i][:-1]
+
+    return longitude.astype("float")
+
+
+def convert_lat(latitude):
+    """ Convert AEMET latitude notation into float number
+
+        N -> +       |    S -> -
+    """
+
+    for i in range(0, latitude.shape[0]):
+        if "N" in latitude.iloc[i]:
+            latitude.iloc[i] = latitude.iloc[i][:-1]
+        elif "S" in latitude.iloc[i]:
+            latitude.iloc[i] = "-"+latitude.iloc[i][:-1]
+
+    return latitude.astype("float")
+
+
 def dot_decimals(data_coma):
     """ Replace coma notation for decimals to dot """
 
@@ -78,6 +108,28 @@ class DownloadAEMET():
         self.api = "?api_key=" + apikey
         self.main_url = "https://opendata.aemet.es/opendata/api"
         self.clima_url = "/valores/climatologicos/"
+
+    def get_nearest_stations(self, provincia=None, lat=None, long=None,
+                             file_name=None):
+        """
+            Obtener las estaciones mas cercanas a una posicion (lat, long) o
+            aquellas que se encuentren en la provincia
+        """
+
+        stations = self.get_stations(file_name=file_name)
+
+        if provincia is not None:
+            n_station = stations[stations["provincia"] == provincia.upper()]
+        elif lat is not None and long is not None:
+            stations["latitud"] = convert_lat(stations["latitud"])
+            stations["longitud"] = convert_long(stations["longitud"])
+
+            n_station = 0
+        else:
+            print("Need some location")
+            n_station = 0
+
+        return n_station
 
     def get_stations(self, file_name=None):
         """ Inventario de estaciones"""
