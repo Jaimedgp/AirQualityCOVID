@@ -27,10 +27,11 @@ group.dy <- function(dataFrame, unit="day", FUN="mean") {
     # Group data by unit using FUN function
 
     dataFrame$date <- floor_date(dataFrame$date, unit=unit)
-    new.df <- aggregate(dataFrame$value,
-                        by=list(dataFrame$date, dataFrame$variable, dataFrame$site),
+    new.df <- aggregate(list(value=dataFrame$value),
+                        by=list(date=dataFrame$date,
+                                variable=dataFrame$variable,
+                                site=dataFrame$site),
                         FUN, na.rm=TRUE, na.action=na.omit)
-    names(new.df) <- c("date", "variable", "site", "value")
     new.df
 }
 
@@ -38,7 +39,6 @@ group.dy <- function(dataFrame, unit="day", FUN="mean") {
 get.site.municipio <- function(municipio,
                                fileName="../data/csv/sitesAQ.csv") {
     # Obtain air quality urban traffic stations in municipio
-
 
     stations <- read.csv(fileName,
                             stringsAsFactors=FALSE) %>%
@@ -93,15 +93,11 @@ group_yr.by.dt <- function(dataFrame, last.yr=2020) {
 
     new.df <- dataFrame[year(dataFrame$date) < last.yr,]
     year(new.df$date) <- last.yr
-    new.df <- aggregate(new.df$value,
-                        by=list(new.df$date,
-                                new.df$variable,
-                                new.df$site),
+    new.df <- aggregate(list(value=new.df$value),
+                        by=list(date=new.df$date,
+                                variable=new.df$variable,
+                                site=new.df$site),
                         mean, na.rm=TRUE, na.action=na.omit)
-    names(new.df) <- c("date",
-                       "variable",
-                       "site",
-                       "value")
     new.df
 }
 

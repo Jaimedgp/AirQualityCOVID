@@ -20,28 +20,26 @@ data.from.site <- function(site="", municipio="",
 }
 
 
+download.site <- function(st, dataframe, data.by.file=FALSE) {
+    pollutant <- levels(as.factor(dataframe[dataframe$site == st,
+                                                    "Pollutant"]
+                             ))
+    start_dt <- min(dataframe[dataframe$site == st,
+                              "start_yr"])
+    end_dt <- max(dataframe[dataframe$site == st,
+                            "end_yr"])
+    get.AQdata(st, pollutant,
+            start_dt, end_dt, data.by.file)
+}
+
+
 data.study <- function(data.by.file=FALSE) {
     checked.sites <- read.csv("data/Curation/checked-AQ.csv",
                               stringsAsFactor=FALSE)
 
-    data.AQ <- data.frame()
-
-    for (st in levels(as.factor(checked.sites$site))) {
-        pollutant <- levels(as.factor(checked.sites[checked.sites$site == st,
-                                                    "Pollutant"]
-                                     ))
-        start_dt <- min(checked.sites[checked.sites$site == st,
-                                      "start_yr"])
-        end_dt <- max(checked.sites[checked.sites$site == st,
-                                      "end_yr"])
-
-        data.AQ <- rbind(data.AQ,
-                         get.AQdata(st, pollutant,
-                                    start_dt, end_dt, data.by.file)
-                         )
-    }
-
-    data.AQ
+    do.call("rbind", lapply(levels(as.factor(checked.sites$site))[1:6],
+                            download.site,
+                            checked.sites, data.by.file))
 }
 
 
@@ -120,6 +118,14 @@ main <- function(dataFrame, periods) {
 
 if(!interactive()) {
 
+    group.by.municipio <- TRUE
+
+    #file.name <- "data/Analisis/Variacion/variacion_media.csv"
+    #folder.name <- "Plots/Analisis/Variacion/by_site/"
+
+    folder.name <- "Plots/Analisis/Variacion/by_municipio/"
+    file.name <- "data/Analisis/Variacion/variacion_media_municipios.csv"
+
     #-------------------------------------
     # Intervalo de estudio con todos los
     #    anhos en los que se va a comparar
@@ -166,7 +172,10 @@ if(!interactive()) {
     #                          data.by.file = FALSE)
 
     data.AQ <- data.study(data.by.file = FALSE)
-    data.AQ <- data.by.municipio(data.AQ)
+
+    if (group.by.municipio) {
+        data.AQ <- data.by.municipio(data.AQ)
+    }
 
     #-------------------------------------
     # Obtencion de la Variacon de las
@@ -182,9 +191,9 @@ if(!interactive()) {
     # Guardar datos en archivo csv
     #-------------------------------------
 
-    write.csv(var.med,
-              "data/Analisis/Variacion/variacion_media_municipios.csv",
-              row.names=FALSE)
+    #write.csv(var.med,
+    #          file.name,
+    #          row.names=FALSE)
 
     #-------------------------------------
     # Representar datos y guardar en
@@ -201,14 +210,13 @@ if(!interactive()) {
                              periods, type="aq")
 
         # Guardar grafica como imagen
-        ggsave(filename=paste("series_temporales_municipios_",
-                              st, ".png", sep=""),
-               plot=plot.AQ,
-               device="png",
-               path="Plots/Analisis/Variacion/",
-               width=20,
-               height=10, dpi=100
-               )
+        #ggsave(filename=paste(st, ".png", sep=""),
+        #       plot=plot.AQ,
+        #       device="png",
+        #       path=folder.name,
+        #       width=20,
+        #       height=10, dpi=100
+        #       )
     }
 
     #X11() # Para la ejecucion desde terminal (linea de comandos)
