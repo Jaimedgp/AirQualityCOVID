@@ -1,216 +1,200 @@
-
 suppressMessages(library(lubridate))
 suppressMessages(library(tidyverse))
 
-source("./functions.R")
-
-#X11() # Para la ejecucion desde terminal (linea de comandos)
-
-#---------------------------------------------------------------
-# Directorios de los archivos de los que leer/escribir datos
-#---------------------------------------------------------------
-
-# Archivo con las estaciones y sus municipios
-sites.fl <- "../../data/csv/sitesAQ.csv"
-
-# Carpeta con los datos de calidad del aire
-data.AQ.fl <- "../data/csv/dataAQ/"
-
-# Carpeta donde guardar los datos en tablas
-data.fl <- "../../data/csv/variaciones/"
-
-# Carpeta donde guardar las graficas
-plot.fl <- "../../Plots/"
+setwd("~/Repositories/AirQualityCOVID")
+source("src/Analisis/Variacion/functions.R")
 
 
-#-----------------------------------------------------------------------------
-#                         PARAMETROS
-#
-# Parametros para la obtencion de los datos de calidad del aire.
-# Si no se pasa ningun codigo de estacion pero se para un municipio
-#     se obtienen las estaciones de trafico urbano del municipio a partir
-#     de la tabla "../data/csv/sitesAQ.csv
-# Si data.by.file= TRUE y existe el archivo fileName/esXXXXa.csv
-#     con los datos de la estacion esXXXXa, los datos son leidos del archivo,
-#     En caso contrario se descargan los datos
-# start <- dt define desde que anho se obtienen los datos
-#-----------------------------------------------------------------------------
+data.from.site <- function(site="", municipio="",
+                           start_dt, end_dt,
+                           pollutant, data.by.file=FALSE) {
+    # obtener estaciones en municipio
+    if (site == "" && municipio != "") {
+        site <- get.site.municipio(municipio)
+    }
 
-municipio = "" #Santander
-site = "es1580a"#c("es1580a", "es0118a")
+    # Obtener los datos de calidad del aire
+    data.AQ <- get.AQdata(site, pollutant, start_dt, end_dt, data.by.file)
+    #head(data.AQ)
+    data.AQ
+}
 
-data.by.file = FALSE
 
-pollutant = c("no2")#, "no", "o3", "pm10", "pm2.5")
-start_dt = 2015
+data.study <- function(data.by.file=FALSE) {
+    checked.sites <- read.csv("data/Curation/checked-AQ.csv",
+                              stringsAsFactor=FALSE)
 
-#-----------------------------------------------------------------------------
-# Fechas con los inicios o finales de cada uno de los periodos en los que se
-#     van a separar los datos para estudiarlos
-#-----------------------------------------------------------------------------
+    data.AQ <- data.frame()
 
-periods <- list(
-    # Prelockdown
-    pre.lckdwn = ymd_hms("2020-01-01 00:00:00"),
+    for (st in levels(as.factor(checked.sites$site))[1:3]) {
+        pollutant <- levels(as.factor(checked.sites[checked.sites$site == st,
+                                                    "Pollutant"]
+                                     ))
+        start_dt <- min(checked.sites[checked.sites$site == st,
+                                      "start_yr"])
+        end_dt <- max(checked.sites[checked.sites$site == st,
+                                      "end_yr"])
 
-    # lockdown
-    lckdwn = ymd_hms("2020-03-14 00:00:00"),
-    end.lckdwn = ymd_hms("2020-04-28 00:00:00"),
+        data.AQ <- rbind(data.AQ,
+                         get.AQdata(st, pollutant,
+                                    start_dt, end_dt, data.by.file)
+                         )
+    }
 
-    # poslockdown
-    start.pos.lckdwn = ymd_hms("2020-05-01 00:00:00"),
-    end.pos.lckdwn = ymd_hms("2020-06-21 00:00:00"),
+    data.AQ
+}
 
-    # 2 lockdown
-    start.2.lckdwn = ymd_hms("2020-10-25 00:00:00"),
-    end.2.lckdwn = ymd_hms("2020-12-31 00:00:00")
-)
+
+data.by.municipio <- function(municipio) {
+}
+
 
 #####################################
 ##           MAIN PROGRAM          ##
 #####################################
+main <- function(dataFrame, periods) {
 
-# obtener estaciones en municipio
-if (site == "" && municipio != "") {
-    site <- get.site.municipio(municipio)
+    start_dt <- year(min(dataFrame$date))
+    end_dt <- year(max(dataFrame$date))
+
+    #------------------------------------
+    #  Calculo Propio de Media diaria
+    #------------------------------------
+
+    data.AQ.dy <- data.AQ %>%
+                    group.dy(unit="day", FUN=mean)
+
+    #------------------------------------
+    #  Comparar Datos por Año
+    #------------------------------------
+
+    data.all <- compare.years(data.AQ.dy, last.yr=end_dt)
+
+    #-----------------------------------------------------------------------
+    #     Variacion de las medias en cada periodo
+    #
+    # Calcular primero la media en cada intervalo de estudio para cada uno
+    #     de los periodos. Despues se calcula la variacion relativa de las
+    #     medias en cada intervalo.
+    #-----------------------------------------------------------------------
+
+    # Calcular Medias
+    columns <- c(end_dt,
+                paste(start_dt, "-", end_dt-1,  sep=""))
+    medias <- mean.in.period(data.all, periods, columns)
+
+    # Calcular variaciones
+    var.med <- get.difference(medias, mainCol=paste("mean(",
+                                                    end_dt, ")", sep=""),
+                                      restCol=c(paste("mean(",
+                                                      start_dt, "-",
+                                                      end_dt-1, ")", sep="")),
+                                      mainSTD=paste("std(",
+                                                    end_dt, ")", sep=""),
+                                      restSTD=paste("std(",
+                                                    start_dt, "-",
+                                                    end_dt-1, ")", sep="")
+                             )
+    # variacion relativa en porcentaje
+    var.med[,4:ncol(var.med)] <- var.med[,4:ncol(var.med)]*100
+
+    list(data.all, var.med)
 }
 
-# Obtener los datos de calidad del aire
-data.AQ <- get.AQdata(site, pollutant, start_dt, data.by.file)
-#head(data.AQ)
 
 
-#------------------------------------
-#  Calculo Propio de Media diaria
-#------------------------------------
+if(!interactive()) {
 
-data.AQ.dy <- data.AQ %>%
-                group.dy(unit="day", FUN=mean)
+    #-------------------------------------
+    # Intervalo de estudio con todos los
+    #    anhos en los que se va a comparar
+    #-------------------------------------
 
-#------------------------------------
-#  Comparar Datos por Año
-#------------------------------------
+    start_dt = ymd_hms("2013-01-01 00:00:00")
+    end_dt = ymd_hms("2020-12-31 00:00:00")
 
-data.all <- compare.years(data.AQ.dy, last.yr=2020)
+    #-----------------------------------------------------------------------------
+    # Fechas con los inicios o finales de cada uno de los periodos en los que se
+    #     van a separar los datos para estudiarlos
+    #-----------------------------------------------------------------------------
 
+    periods <- list(
+        # Prelockdown
+        pre.lckdwn = ymd_hms("2020-01-01 00:00:00"),
 
-#-----------------------------------------------------------------------
-#     Variacion de las medias en cada periodo
-#
-# Calcular primero la media en cada intervalo de estudio para cada uno
-#     de los periodos. Despues se calcula la variacion relativa de las
-#     medias en cada intervalo.
-#-----------------------------------------------------------------------
+        # lockdown
+        lckdwn = ymd_hms("2020-03-14 00:00:00"),
+        #end.lckdwn = ymd_hms("2020-04-28 00:00:00"),
 
-# Calcular Medias
-columns <- c("2020",
-             "2019",
-             paste(start_dt, "-2019", sep=""))
-medias <- mean.in.period(data.all, periods, columns)
+        # poslockdown
+        fases = ymd_hms("2020-05-01 00:00:00"),
+        normalidad = ymd_hms("2020-06-21 00:00:00"),
 
-# Calcular variaciones
-var.med <- get.difference(medias, mainCol="mean(2020)",
-                                  restCol=c("mean(2019)",
-                                            paste("mean(",
-                                                  start_dt,
-                                                  "-2019)", sep="")),
-                                  mainSTD="std(2020)",
-                                  restSTD=c("std(2019)",
-                                            paste("std(",
-                                                  start_dt,
-                                                  "-2019)", sep=""))
-                         )
-# variacion relativa en porcentaje
-var.med[,4:ncol(var.med)] <- var.med[,4:ncol(var.med)]*100
+        # 2 lockdown
+        new.lockdown = ymd_hms("2020-10-25 00:00:00"),
+        end.year = ymd_hms("2020-12-31 00:00:00")
+    )
 
-# Guardar datos en fichero
-#write.csv(var.med,
-#          paste(data.fl,
-#                "variacion_media.csv",
-#                sep=""),
-#          row.names=FALSE)
+    #-----------------------------------------------------------------------------
+    # Datos de calidad del aire para el estudio. Se pueden estudiar casos
+    #    particulares dando el codigo de la estacion o el municipio de estudio.
+    #    Tambien se permite coger todas las estaciones individuales del estudio
+    #    a partir del fichero o estudiar los datos por municipios, haciendo la
+    #    media de todas las estaciones de un mismo municipio.
+    #-----------------------------------------------------------------------------
 
-# Mostrar valores segun estacion, contaminante e intervalo
-var.med[var.med$site == site[1] &
-        var.med$variable == pollutant[1] &
-        var.med$period %in% names(periods)
-       ,]
+    #data.AQ <- data.from.site(site = "es1580a", #c("es1580a", "es0118a"),
+    #                          municipio = "", #Santander
+    #                          start_dt = start_dt,
+    #                          end_dt = end_dt,
+    #                          pollutant=c("no2", "no"),
+    #                          data.by.file = FALSE)
 
+    data.AQ <- data.study(data.by.file = FALSE)
 
-#-----------------------------------------------------------------------
-#     Media de las variaciones en cada periodo
-#
-# Calcular primero la variacion relativa para cada uno de los periodos
-#     en cada intervalo de estudio. Despues se calcula la media de las
-#     variacion relativa en cada intervalo.
-#-----------------------------------------------------------------------
+    #-------------------------------------
+    # Obtencion de la Variacon de las
+    #     medias en cada intervalo
+    #-------------------------------------
 
-# Calcular variaciones
-var.med <- get.difference(data.all, mainCol="2020",
-                                    restCol=c("2019",
-                                              paste(start_dt, "-2019", sep=""))
-                         )
-# variacion relativa en porcentaje
-var.med[,4:ncol(var.med)] <- var.med[,4:ncol(var.med)]*100
+    compute <- main(data.AQ, periods)
 
+    data.all <- compute[[1]]
+    var.med <- compute[[2]]
 
-# Calcular Medias
-columns <- c("2019.vs.2020",
-             paste(start_dt, "-2019.vs.2020", sep=""))
-medias <- mean.in.period(var.med, periods, columns)
+    #-------------------------------------
+    # Guardar datos en archivo csv
+    #-------------------------------------
 
-# Guardar datos en fichero
-#write.csv(medias,
-#          paste(data.fl,
-#                "media_variacion.csv",
-#                sep=""),
-#          row.names=FALSE)
+    write.csv(var.med,
+              "data/Analisis/Variacion/variacion_media.csv",
+              row.names=FALSE)
 
-# Mostrar valores segun estacion, contaminante e intervalo
-medias[medias$site == site[1] &
-        medias$variable == pollutant[1] &
-        medias$period %in% names(periods)
-       ,]
+    #-------------------------------------
+    # Representar datos y guardar en
+    #     un archivo
+    #-------------------------------------
 
+    for (st in levels(as.factor(data.all$site))) {
 
-################################
-#   Representar Resultados
-################################
+        names.df <- names(data.all)[(ncol(data.all)-1):ncol(data.all)]
 
-#---------------------------------
-#    Variacion Relativa
-#---------------------------------
+        # Representar los datos de calidad del aire
+        plot.AQ <- plot.data(data.all[data.all$site == st, ],
+                             names.df,
+                             periods, type="aq")
 
-# Representar las variaciones relativas diarias
-plot.change <- plot.data(var.med,
-          c("2019.vs.2020",
-            paste(start_dt,
-                  "-2019.vs.2020", sep="")),
-          periods, type="var")
+        # Guardar grafica como imagen
+        ggsave(filename=paste("series_temporales_",
+                              st, ".png", sep=""),
+               plot=plot.AQ,
+               device="png",
+               path="Plots/Analisis/Variacion/",
+               width=20,
+               height=10, dpi=100
+               )
+    }
 
-# Guardar grafica como imagen
-#ggsave(filename="cambio_relativo.png",
-#       plot=plot.change,
-#       device="png",
-#       path=plot.fl)
-
-
-#---------------------------------
-#    Series TEmporales
-#---------------------------------
-
-# Representar los datos de calidad del aire
-plot.AQ <- plot.data(data.all,
-          c("2020",
-            "2019",
-            paste(start_dt, "-2019", sep="")),
-          periods, type="aq")
-
-# Guardar grafica como imagen
-#ggsave(filename="comparacion_series_temporales.png",
-#       plot=plot.AQ,
-#       device="png",
-#       path=plot.fl)
-
-
-#plot(plot.AQ) # Mostrar grafica por pantalla
+    #X11() # Para la ejecucion desde terminal (linea de comandos)
+    #plot(plot.AQ) # Mostrar grafica por pantalla
+}

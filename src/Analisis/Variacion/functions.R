@@ -53,7 +53,7 @@ get.site.municipio <- function(municipio,
 }
 
 
-get.AQdata <- function(site="", pollutant, start_dt,
+get.AQdata <- function(site="", pollutant, start_dt, end_dt,
                        data.by.file=FALSE, fileName="../data/csv/dataAQ/") {
     # Obtain air quiality data of site station.
     #
@@ -69,8 +69,8 @@ get.AQdata <- function(site="", pollutant, start_dt,
             data.AQ <- rbind(data.AQ,
                              read.csv(fl, stringsAsFactor=FALSE) %>%
                                 filter(variable %in% pollutant) %>%
-                                date.as.datetime() %>%
-                                filter(year(date) >= start_dt)
+                                date.as.datetime()
+                            #%>% filter(year(date) >= start_dt)
                             )
         }
     } else {
@@ -78,6 +78,7 @@ get.AQdata <- function(site="", pollutant, start_dt,
             site = site,
             variable = pollutant,
             start = start_dt,
+            end = end_dt,
             valid_only = TRUE,
             verbose = TRUE
         ))
@@ -109,20 +110,22 @@ compare.years <- function(dataFrame, last.yr=2020) {
     # Create a new.dataFrame with the data of last.yr in one column, the data of
     #     the year before last.yr in other and the mean of all years before last.yr
 
-    data.20 <- dataFrame[year(dataFrame$date) == last.yr,]
-    data.19 <- dataFrame[year(dataFrame$date) == last.yr-1,]
-    year(data.19$date) <- last.yr
+    data.last <- dataFrame[year(dataFrame$date) == last.yr,]
+    #data.19 <- dataFrame[year(dataFrame$date) == last.yr-1,]
+    #year(data.19$date) <- last.yr
 
-    new.df <- merge(x=data.20,
-                    y=data.19,
-                    by=c("date", "variable", "site"), all=T)
-    names(new.df)[which(names(new.df) == "value.x")] <- as.character(last.yr)
-    names(new.df)[which(names(new.df) == "value.y")] <- as.character(last.yr-1)
+    #new.df <- merge(x=data.20,
+    #                y=data.19,
+    #                by=c("date", "variable", "site"), all=T)
+    #names(new.df)[which(names(new.df) == "value.x")] <- as.character(last.yr)
+    #names(new.df)[which(names(new.df) == "value.y")] <- as.character(last.yr-1)
 
-    new.df <- merge(x=new.df,
+    #new.df <- merge(x=new.df,
+    new.df <- merge(x=data.last,
                     y=group_yr.by.dt(dataFrame, last.yr),
                     by=c("date", "variable", "site"), all=T)
-    names(new.df)[which(names(new.df) == "value")] <- paste(
+    names(new.df)[which(names(new.df) == "value.x")] <- as.character(last.yr)
+    names(new.df)[which(names(new.df) == "value.y")] <- paste(
                     as.character(year(min(dataFrame$date))),
                     as.character(last.yr-1),
                     sep="-")
@@ -133,14 +136,15 @@ compare.years <- function(dataFrame, last.yr=2020) {
 mean.in.period <- function(dataFrame, periods, columns) {
     # Divide dataFrame's columns by periods and calculate the mean of each
 
-    pollutants <- levels(as.factor(dataFrame$variable))
+    pollutant <- levels(as.factor(dataFrame$variable))
     site <- levels(as.factor(dataFrame$site))
 
     nnrow <- length(periods) - 1
     nncol <- 2*length(columns) + 3
 
     all.means <- data.frame(matrix(rep(NA, nnrow*nncol*length(pollutant)),
-                                   nrow=nnrow*length(pollutant))
+                                   nrow=nnrow*length(pollutant),
+                                   ncol=nncol)
                            )
 
     for (i in 1:length(site)) {
@@ -221,11 +225,6 @@ plot.var.data <- function(data.plot, dataFrame, columns) {
                                            color = columns[1]
                                           ),
                                        size = 2.0)
-    data.plot <- data.plot + geom_line(aes(x = date,
-                                           y = dataFrame[,columns[2]],
-                                           color = columns[2]
-                                          ),
-                                       size = 2.0)
 
     data.plot +
        geom_hline(yintercept=0,
@@ -246,11 +245,6 @@ plot.AQdata <- function(data.plot, dataFrame, columns) {
     data.plot <- data.plot + geom_line(aes(x = date,
                                            y = dataFrame[,columns[2]],
                                            color = columns[2]
-                                          ),
-                                       size = 2.0)
-    data.plot <- data.plot + geom_line(aes(x = date,
-                                           y = dataFrame[,columns[3]],
-                                           color = columns[3]
                                           ),
                                        size = 2.0)
 
