@@ -83,6 +83,7 @@ get.AQdata <- function(site="", pollutant, start_dt, end_dt,
             verbose = TRUE
         ))
     }
+    print(paste(site, levels(as.factor(data.AQ$variable)), sep=": "))
     data.AQ
 }
 
@@ -136,32 +137,34 @@ compare.years <- function(dataFrame, last.yr=2020) {
 mean.in.period <- function(dataFrame, periods, columns) {
     # Divide dataFrame's columns by periods and calculate the mean of each
 
-    pollutant <- levels(as.factor(dataFrame$variable))
-    site <- levels(as.factor(dataFrame$site))
+    all.data <- data.frame()
 
+    site <- levels(as.factor(dataFrame$site))
     nnrow <- length(periods) - 1
     nncol <- 2*length(columns) + 3
 
-    all.means <- data.frame(matrix(rep(NA, nnrow*nncol*length(pollutant)),
-                                   nrow=nnrow*length(pollutant),
-                                   ncol=nncol)
-                           )
-
     for (i in 1:length(site)) {
-        i.init <- (i-1)*(nnrow*length(pollutant))
-        y.i <- i*(nnrow*length(pollutant))
+        # Create the dataframe for each station
+        pollutant <- levels(as.factor(dataFrame[dataFrame$site == site[i],
+                                                "variable"]))
 
-        all.means[i.init+1:y.i, 2] <- rep(site[i], nnrow*length(pollutant))
+        all.means <- data.frame(matrix(rep(NA, nnrow*nncol*length(pollutant)),
+                                           nrow=nnrow*length(pollutant),
+                                           ncol=nncol)
+                                      )
+        y.i <- (nnrow*length(pollutant))
+
+        all.means[1:y.i, 2] <- rep(site[i], nnrow*length(pollutant))
 
         for (j in 1:length(pollutant)) {
-            j.init <- i.init + (j-1)*nnrow
+            j.init <- (j-1)*nnrow
 
             all.means[(j.init+1):(j.init+nnrow), 3] <- rep(pollutant[j], nnrow)
 
             data.poll <- dataFrame[dataFrame$variable == pollutant[j],]
 
             for (k in 1:(length(periods)-1)) {
-                x.k <- i.init + (j-1)*nnrow
+                x.k <- (j-1)*nnrow
 
                 all.means[x.k+k, 1] <- names(periods)[k]
                 for (l in 1:length(columns)) {
@@ -177,16 +180,19 @@ mean.in.period <- function(dataFrame, periods, columns) {
                 }
             }
         }
+
+        all.data <- rbind(all.data,
+                          all.means)
     }
 
     # Set columns names
-    names(all.means)[1:3] <- c("period", "site", "variable")
+    names(all.data)[1:3] <- c("period", "site", "variable")
     for (i in 1:length(columns)){
         i.init <- (i-1)*2
-        names(all.means)[i.init+4] <- paste("mean(", columns[i], ")", sep="")
-        names(all.means)[i.init+5] <- paste("std(" , columns[i], ")", sep="")
+        names(all.data)[i.init+4] <- paste("mean(", columns[i], ")", sep="")
+        names(all.data)[i.init+5] <- paste("std(" , columns[i], ")", sep="")
     }
-    all.means
+    all.data
 }
 
 

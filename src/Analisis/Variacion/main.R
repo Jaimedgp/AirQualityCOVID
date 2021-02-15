@@ -30,6 +30,7 @@ data.study <- function(data.by.file=FALSE) {
         pollutant <- levels(as.factor(checked.sites[checked.sites$site == st,
                                                     "Pollutant"]
                                      ))
+        print(paste(st, pollutant, sep=": "))
         start_dt <- min(checked.sites[checked.sites$site == st,
                                       "start_yr"])
         end_dt <- max(checked.sites[checked.sites$site == st,
