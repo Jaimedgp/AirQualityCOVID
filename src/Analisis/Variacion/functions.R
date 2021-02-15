@@ -129,57 +129,14 @@ compare.years <- function(dataFrame, last.yr=2020) {
 }
 
 
-mean.in.period <- function(dataFrame, periods, columns) {
-    # Divide dataFrame's columns by periods and calculate the mean of each
-
-    all.data <- data.frame()
+site.mean.in.period <- function(dataFrame, periods, columns) {
+    # Apply mean.in.period for each site
 
     site <- levels(as.factor(dataFrame$site))
-    nnrow <- length(periods) - 1
-    nncol <- 2*length(columns) + 3
 
-    for (i in 1:length(site)) {
-        # Create the dataframe for each station
-        pollutant <- levels(as.factor(dataFrame[dataFrame$site == site[i],
-                                                "variable"]))
-
-        all.means <- data.frame(matrix(rep(NA, nnrow*nncol*length(pollutant)),
-                                           nrow=nnrow*length(pollutant),
-                                           ncol=nncol)
-                                      )
-        y.i <- (nnrow*length(pollutant))
-
-        all.means[1:y.i, 2] <- rep(site[i], nnrow*length(pollutant))
-
-        for (j in 1:length(pollutant)) {
-            j.init <- (j-1)*nnrow
-
-            all.means[(j.init+1):(j.init+nnrow), 3] <- rep(pollutant[j], nnrow)
-
-            data.poll <- dataFrame[dataFrame$variable == pollutant[j],]
-
-            for (k in 1:(length(periods)-1)) {
-                x.k <- (j-1)*nnrow
-
-                all.means[x.k+k, 1] <- names(periods)[k]
-                for (l in 1:length(columns)) {
-                    l.init <- (l-1)*2
-                    all.means[x.k+k, l.init+4] <- mean(
-                        data.poll[data.poll$date >= periods[[k]] &
-                        data.poll$date < periods[[k+1]], columns[l]], na.rm=T
-                    )
-                    all.means[x.k+k, l.init+5] <- sd(
-                        data.poll[data.poll$date >= periods[[k]] &
-                        data.poll$date < periods[[k+1]], columns[l]], na.rm=T
-                    )
-                }
-            }
-        }
-
-        all.data <- rbind(all.data,
-                          all.means)
-    }
-
+    all.data <- do.call("rbind", lapply(site,
+                                        FUN=mean.in.period,
+                                        dataFrame, periods, columns))
     # Set columns names
     names(all.data)[1:3] <- c("period", "site", "variable")
     for (i in 1:length(columns)){
@@ -188,6 +145,50 @@ mean.in.period <- function(dataFrame, periods, columns) {
         names(all.data)[i.init+5] <- paste("std(" , columns[i], ")", sep="")
     }
     all.data
+}
+
+mean.in.period <- function(st, dataFrame, periods, columns) {
+    # Divide dataFrame's columns by periods and calculate the mean of each
+
+    # Create the dataframe for each station
+    nnrow <- length(periods) - 1
+    nncol <- 2*length(columns) + 3
+    pollutant <- levels(as.factor(dataFrame[dataFrame$site == st,
+                                            "variable"]))
+
+    y.i <- (nnrow*length(pollutant))
+    all.means <- data.frame(matrix(rep(NA, nnrow*nncol*length(pollutant)),
+                                       nrow=,
+                                       ncol=nncol)
+                                    )
+
+    all.means[1:y.i, 2] <- rep(st, nnrow*length(pollutant))
+
+    for (j in 1:length(pollutant)) {
+        j.init <- (j-1)*nnrow
+
+        all.means[(j.init+1):(j.init+nnrow), 3] <- rep(pollutant[j], nnrow)
+
+        data.poll <- dataFrame[dataFrame$variable == pollutant[j],]
+
+        for (k in 1:(length(periods)-1)) {
+            x.k <- (j-1)*nnrow
+
+            all.means[x.k+k, 1] <- names(periods)[k]
+            for (l in 1:length(columns)) {
+                l.init <- (l-1)*2
+                all.means[x.k+k, l.init+4] <- mean(
+                    data.poll[data.poll$date >= periods[[k]] &
+                    data.poll$date < periods[[k+1]], columns[l]], na.rm=T
+                )
+                all.means[x.k+k, l.init+5] <- sd(
+                    data.poll[data.poll$date >= periods[[k]] &
+                    data.poll$date < periods[[k+1]], columns[l]], na.rm=T
+                )
+            }
+        }
+    }
+    all.means
 }
 
 

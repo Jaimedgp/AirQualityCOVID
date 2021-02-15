@@ -94,7 +94,7 @@ main <- function(dataFrame, periods) {
     # Calcular Medias
     columns <- c(end_dt,
                 paste(start_dt, "-", end_dt-1,  sep=""))
-    medias <- mean.in.period(data.all, periods, columns)
+    medias <- site.mean.in.period(data.all, periods, columns)
 
     # Calcular variaciones
     var.med <- get.difference(medias, mainCol=paste("mean(",
@@ -191,9 +191,9 @@ if(!interactive()) {
     # Guardar datos en archivo csv
     #-------------------------------------
 
-    #write.csv(var.med,
-    #          file.name,
-    #          row.names=FALSE)
+    write.csv(var.med,
+              file.name,
+              row.names=FALSE)
 
     #-------------------------------------
     # Representar datos y guardar en
@@ -210,13 +210,13 @@ if(!interactive()) {
                              periods, type="aq")
 
         # Guardar grafica como imagen
-        #ggsave(filename=paste(st, ".png", sep=""),
-        #       plot=plot.AQ,
-        #       device="png",
-        #       path=folder.name,
-        #       width=20,
-        #       height=10, dpi=100
-        #       )
+        ggsave(filename=paste(st, ".png", sep=""),
+               plot=plot.AQ,
+               device="png",
+               path=folder.name,
+               width=20,
+               height=10, dpi=100
+               )
     }
 
     #X11() # Para la ejecucion desde terminal (linea de comandos)
