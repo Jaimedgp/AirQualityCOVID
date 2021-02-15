@@ -26,11 +26,10 @@ data.study <- function(data.by.file=FALSE) {
 
     data.AQ <- data.frame()
 
-    for (st in levels(as.factor(checked.sites$site))[1:3]) {
+    for (st in levels(as.factor(checked.sites$site))) {
         pollutant <- levels(as.factor(checked.sites[checked.sites$site == st,
                                                     "Pollutant"]
                                      ))
-        print(paste(st, pollutant, sep=": "))
         start_dt <- min(checked.sites[checked.sites$site == st,
                                       "start_yr"])
         end_dt <- max(checked.sites[checked.sites$site == st,
@@ -46,7 +45,7 @@ data.study <- function(data.by.file=FALSE) {
 }
 
 
-data.by.municipio <- function(dataFrame) {
+data.by.municipio <- function(dataframe) {
     municipios <- read.csv("data/Curation/sitesAQ.csv",
                            stringsAsFactor=TRUE)
 
@@ -55,7 +54,7 @@ data.by.municipio <- function(dataFrame) {
         dataframe[dataframe$site == st, "site"] <- municipios[municipios$site == st, "Municipio"]
     }
 
-    new.df <- aggregate(dataframe$value,
+    new.df <- aggregate(list(value=dataframe$value),
                         by=list(date=dataframe$date,
                                 site=dataframe$site,
                                 variable=dataframe$variable),
@@ -167,6 +166,7 @@ if(!interactive()) {
     #                          data.by.file = FALSE)
 
     data.AQ <- data.study(data.by.file = FALSE)
+    data.AQ <- data.by.municipio(data.AQ)
 
     #-------------------------------------
     # Obtencion de la Variacon de las
@@ -183,7 +183,7 @@ if(!interactive()) {
     #-------------------------------------
 
     write.csv(var.med,
-              "data/Analisis/Variacion/variacion_media.csv",
+              "data/Analisis/Variacion/variacion_media_municipios.csv",
               row.names=FALSE)
 
     #-------------------------------------
@@ -201,7 +201,7 @@ if(!interactive()) {
                              periods, type="aq")
 
         # Guardar grafica como imagen
-        ggsave(filename=paste("series_temporales_",
+        ggsave(filename=paste("series_temporales_municipios_",
                               st, ".png", sep=""),
                plot=plot.AQ,
                device="png",

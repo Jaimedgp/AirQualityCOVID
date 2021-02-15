@@ -83,7 +83,6 @@ get.AQdata <- function(site="", pollutant, start_dt, end_dt,
             verbose = TRUE
         ))
     }
-    print(paste(site, levels(as.factor(data.AQ$variable)), sep=": "))
     data.AQ
 }
 
