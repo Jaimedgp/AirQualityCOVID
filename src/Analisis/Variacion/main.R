@@ -46,7 +46,22 @@ data.study <- function(data.by.file=FALSE) {
 }
 
 
-data.by.municipio <- function(municipio) {
+data.by.municipio <- function(dataFrame) {
+    municipios <- read.csv("data/Curation/sitesAQ.csv",
+                           stringsAsFactor=TRUE)
+
+    for (st in levels(municipios$site)) {
+
+        dataframe[dataframe$site == st, "site"] <- municipios[municipios$site == st, "Municipio"]
+    }
+
+    new.df <- aggregate(dataframe$value,
+                        by=list(date=dataframe$date,
+                                site=dataframe$site,
+                                variable=dataframe$variable),
+                        mean, na.rm=TRUE, na.action=na.omit)
+
+    new.df
 }
 
 
