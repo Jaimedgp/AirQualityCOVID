@@ -37,7 +37,7 @@ data.study <- function(data.by.file=FALSE) {
     checked.sites <- read.csv("data/Curation/checked-AQ.csv",
                               stringsAsFactor=FALSE)
 
-    do.call("rbind", lapply(levels(as.factor(checked.sites$site))[1:6],
+    do.call("rbind", lapply(levels(as.factor(checked.sites$site)),
                             download.site,
                             checked.sites, data.by.file))
 }
@@ -120,12 +120,6 @@ if(!interactive()) {
 
     group.by.municipio <- TRUE
 
-    #file.name <- "data/Analisis/Variacion/variacion_media.csv"
-    #folder.name <- "Plots/Analisis/Variacion/by_site/"
-
-    folder.name <- "Plots/Analisis/Variacion/by_municipio/"
-    file.name <- "data/Analisis/Variacion/variacion_media_municipios.csv"
-
     #-------------------------------------
     # Intervalo de estudio con todos los
     #    anhos en los que se va a comparar
@@ -175,6 +169,12 @@ if(!interactive()) {
 
     if (group.by.municipio) {
         data.AQ <- data.by.municipio(data.AQ)
+
+        folder.name <- "Plots/Analisis/Variacion/by_municipio/"
+        file.name <- "data/Analisis/Variacion/variacion_media_municipios.csv"
+    } else {
+        file.name <- "data/Analisis/Variacion/variacion_media.csv"
+        folder.name <- "Plots/Analisis/Variacion/by_site/"
     }
 
     #-------------------------------------

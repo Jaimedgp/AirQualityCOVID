@@ -150,15 +150,16 @@ site.mean.in.period <- function(dataFrame, periods, columns) {
 mean.in.period <- function(st, dataFrame, periods, columns) {
     # Divide dataFrame's columns by periods and calculate the mean of each
 
+    dataFrame <- dataFrame[dataFrame$site ==st,]
+
     # Create the dataframe for each station
     nnrow <- length(periods) - 1
     nncol <- 2*length(columns) + 3
-    pollutant <- levels(as.factor(dataFrame[dataFrame$site == st,
-                                            "variable"]))
+    pollutant <- levels(as.factor(dataFrame$variable))
 
     y.i <- (nnrow*length(pollutant))
     all.means <- data.frame(matrix(rep(NA, nnrow*nncol*length(pollutant)),
-                                       nrow=,
+                                       #nrow=,
                                        ncol=nncol)
                                     )
 
