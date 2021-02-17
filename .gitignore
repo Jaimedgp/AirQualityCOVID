@@ -69,4 +69,4 @@ src/Curation/AEMET/apikey_file.py
 
 .ipynb_checkpoints/
 
-notebooks/Test/
+notebooks/Tests/
