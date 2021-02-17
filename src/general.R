@@ -1,4 +1,5 @@
 suppressMessages(library(saqgetr))
+suppressMessages(library(lubridate))
 
 
 filter.by.std <- function(dataFrame, columns, numSTD=3) {

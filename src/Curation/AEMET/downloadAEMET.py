@@ -16,11 +16,12 @@ import numpy as np
 from dateutil.relativedelta import relativedelta
 
 
-def calc_dist(pos1, pos2, radius=3958.75):
+#  3958.75
+def calc_dist(pos1, pos2, radius=6371):
     """ Calculate distance in latitudes and longitudes """
 
-    pos1 = np.deg2rad(pos1.values)
-    pos2 = np.deg2rad(pos2.values)
+    pos1 = np.deg2rad(pos1)
+    pos2 = np.deg2rad(pos2)
 
     dist = radius * np.arccos(np.cos(pos1[0] - pos2[0]) -
                               np.cos(pos1[0]) *
@@ -30,42 +31,21 @@ def calc_dist(pos1, pos2, radius=3958.75):
     return dist
 
 
-def convert_long(longitude):
-    """ Convert AEMET longitude notation into float number
+def convert_coordiantes(longitude):
+    """ Convert AEMET longitude or latitude angles into float number
 
         E -> +       |    W -> -
-    """
-
-    signo = {"E": 1, "W": -1}
-
-    for i in range(0, longitude.shape[0]):
-        orientation = longitude.iloc[i][-1]
-        grados = float(longitude.iloc[i][:2])
-        minutes = float(longitude.iloc[i][2:4]) / 60
-        seconds = float(longitude.iloc[i][4:6]) / 3600
-
-        longitude.iloc[i] = signo[orientation]*(grados+minutes+seconds)
-
-    return longitude
-
-
-def convert_lat(latitude):
-    """ Convert AEMET latitude notation into float number
-
         N -> +       |    S -> -
     """
 
-    signo = {"N": 1, "S": -1}
+    signo = {"E": 1, "W": -1, "N": 1, "S": -1}
 
-    for i in range(0, latitude.shape[0]):
-        orientation = latitude.iloc[i][-1]
-        grados = float(latitude.iloc[i][:2])
-        minutes = float(latitude.iloc[i][2:4]) / 60
-        seconds = float(latitude.iloc[i][4:6]) / 3600
+    orientation = longitude[-1]
+    grados = float(longitude[:2])
+    minutes = float(longitude[2:4]) / 60
+    seconds = float(longitude[4:6]) / 3600
 
-        latitude.iloc[i] = signo[orientation]*(grados+minutes+seconds)
-
-    return latitude
+    return signo[orientation]*(grados+minutes+seconds)
 
 
 def dot_decimals(data_coma):
@@ -163,13 +143,21 @@ class DownloadAEMET():
 
         file = save_json(sites, file_name)
         self.stations = pd.read_json(file)
-        self.stations["latitud"] = convert_lat(self.stations["latitud"].copy())
-        self.stations["longitud"] = convert_long(self.stations["longitud"].copy())
+        self.stations["latitud"] = self.stations.apply(
+            lambda df:
+            convert_coordiantes(df["latitud"]),
+            axis=1
+            )
+
+        self.stations["longitud"] = self.stations.apply(
+            lambda df:
+            convert_coordiantes(df["longitud"]),
+            axis=1
+            )
 
         return self.stations
 
-    def get_data(self, start_dt, end_dt, station_id,
-                 json_name=None, csv_name=None):
+    def get_data(self, dates, station_id, json_name=None, csv_name=None):
         """                Obtain clima data
 
             Aemet include same values that have to be replace to make the
@@ -184,11 +172,10 @@ class DownloadAEMET():
             | Varios |         Varias horas        |     -2       |
         """
 
-        split_dt = split_date(start_dt, end_dt)
+        split_dt = split_date(dates[0], dates[1])
         data = []
 
         for i, j in split_dt:
-
             to_obtain = requests.get((self.main_url +
                                       self.clima_url +
                                       "diarios/datos/" +
