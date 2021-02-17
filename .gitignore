@@ -62,4 +62,11 @@ Bibliografia/
 ./*/*/old/
 
 # Python packages
-*/__pycache__/*.pyc
+*/__pycache__/
+*/*/*/__pycache__/
+
+src/Curation/AEMET/apikey_file.py
+
+.ipynb_checkpoints/
+
+notebooks/Test/
