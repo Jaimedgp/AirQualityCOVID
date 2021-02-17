@@ -11,8 +11,23 @@ import tempfile as tmpfl
 import json
 import requests
 import pandas as pd
+import numpy as np
 
 from dateutil.relativedelta import relativedelta
+
+
+def calc_dist(pos1, pos2, radius=3958.75):
+    """ Calculate distance in latitudes and longitudes """
+
+    pos1 = np.deg2rad(pos1.values)
+    pos2 = np.deg2rad(pos2.values)
+
+    dist = radius * np.arccos(np.cos(pos1[0] - pos2[0]) -
+                              np.cos(pos1[0]) *
+                              np.cos(pos2[0]) *
+                              (1 - np.cos(pos1[1] - pos2[1])))
+
+    return dist
 
 
 def convert_long(longitude):
@@ -21,13 +36,17 @@ def convert_long(longitude):
         E -> +       |    W -> -
     """
 
-    for i in range(0, longitude.shape[0]):
-        if "E" in longitude.iloc[i]:
-            longitude.iloc[i] = longitude.iloc[i][:-1]
-        elif "W" in longitude.iloc[i]:
-            longitude.iloc[i] = "-"+longitude.iloc[i][:-1]
+    signo = {"E": 1, "W": -1}
 
-    return longitude.astype("float")
+    for i in range(0, longitude.shape[0]):
+        orientation = longitude.iloc[i][-1]
+        grados = float(longitude.iloc[i][:2])
+        minutes = float(longitude.iloc[i][2:4]) / 60
+        seconds = float(longitude.iloc[i][4:6]) / 3600
+
+        longitude.iloc[i] = signo[orientation]*(grados+minutes+seconds)
+
+    return longitude
 
 
 def convert_lat(latitude):
@@ -36,13 +55,17 @@ def convert_lat(latitude):
         N -> +       |    S -> -
     """
 
-    for i in range(0, latitude.shape[0]):
-        if "N" in latitude.iloc[i]:
-            latitude.iloc[i] = latitude.iloc[i][:-1]
-        elif "S" in latitude.iloc[i]:
-            latitude.iloc[i] = "-"+latitude.iloc[i][:-1]
+    signo = {"N": 1, "S": -1}
 
-    return latitude.astype("float")
+    for i in range(0, latitude.shape[0]):
+        orientation = latitude.iloc[i][-1]
+        grados = float(latitude.iloc[i][:2])
+        minutes = float(latitude.iloc[i][2:4]) / 60
+        seconds = float(latitude.iloc[i][4:6]) / 3600
+
+        latitude.iloc[i] = signo[orientation]*(grados+minutes+seconds)
+
+    return latitude
 
 
 def dot_decimals(data_coma):
@@ -109,27 +132,22 @@ class DownloadAEMET():
         self.main_url = "https://opendata.aemet.es/opendata/api"
         self.clima_url = "/valores/climatologicos/"
 
-    def get_nearest_stations(self, provincia=None, lat=None, long=None,
-                             file_name=None):
+        self.stations = None
+
+    def get_nearest_stations(self, lat, long, near=3):
         """
             Obtener las estaciones mas cercanas a una posicion (lat, long) o
             aquellas que se encuentren en la provincia
         """
 
-        stations = self.get_stations(file_name=file_name)
+        if self.stations is None:
+            self.stations = self.get_stations()
 
-        if provincia is not None:
-            n_station = stations[stations["provincia"] == provincia.upper()]
-        elif lat is not None and long is not None:
-            stations["latitud"] = convert_lat(stations["latitud"])
-            stations["longitud"] = convert_long(stations["longitud"])
+        self.stations["dist"] = calc_dist([self.stations["latitud"].values,
+                                           self.stations["longitud"].values],
+                                          [lat, long])
 
-            n_station = 0
-        else:
-            print("Need some location")
-            n_station = 0
-
-        return n_station
+        return self.stations.sort_values(by=['dist'], ascending=True)[:near]
 
     def get_stations(self, file_name=None):
         """ Inventario de estaciones"""
@@ -138,14 +156,17 @@ class DownloadAEMET():
                                   self.clima_url +
                                   "inventarioestaciones/todasestaciones/" +
                                   self.api
-                                  ),  {'accept': 'application/json'}).json()
+                                  ), {'accept': 'application/json'}).json()
 
         sites = requests.get(to_obtain["datos"],
                              {'accept': 'application/json'}).json()
 
         file = save_json(sites, file_name)
+        self.stations = pd.read_json(file)
+        self.stations["latitud"] = convert_lat(self.stations["latitud"].copy())
+        self.stations["longitud"] = convert_long(self.stations["longitud"].copy())
 
-        return pd.read_json(file)
+        return self.stations
 
     def get_data(self, start_dt, end_dt, station_id,
                  json_name=None, csv_name=None):
