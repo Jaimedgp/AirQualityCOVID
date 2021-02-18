@@ -265,7 +265,8 @@ plot.data <- function(dataFrame, columns, periods, type) {
 
     data.plot <- ggplot(data=dataFrame) +
         facet_wrap(~variable+site, ncol=min(length(variable),
-                                            length(site)))
+                                            length(site)),
+                                    scale="free_y")
 
     if (type == "aq") {
         data.plot <- plot.AQdata(data.plot, dataFrame, columns)
