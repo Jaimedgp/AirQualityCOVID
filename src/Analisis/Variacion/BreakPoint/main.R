@@ -37,7 +37,7 @@ data.study <- function(data.by.file=FALSE) {
     checked.sites <- read.csv("data/Curation/checked-AQ.csv",
                               stringsAsFactor=FALSE)
 
-    do.call("rbind", lapply(levels(as.factor(checked.sites$site))[1:4],
+    do.call("rbind", lapply(levels(as.factor(checked.sites$site)),
                             download.site,
                             checked.sites, data.by.file))
 }
@@ -104,7 +104,7 @@ main <- function(dataFrame, periods) {
 
 if(!interactive()) {
 
-    group.by.municipio <- FALSE
+    group.by.municipio <- TRUE
 
     #-------------------------------------
     # Intervalo de estudio con todos los
@@ -194,37 +194,36 @@ if(!interactive()) {
         names.df <- names(var.med)[ncol(var.med)]
 
         # Representar los datos de calidad del aire
-        plot.AQ <- ggplot(data=var.med[var.med$site == st &
-                                     var.med$variable == "no", ],
-                          aes(x=date, y=names.df)) +
-                        geom_point()
+        plot.AQ <- ggplot(data=var.med[var.med$site == st, ],
+                          aes(x=date, y=var.med[var.med$site == st, names.df])) +
+                        geom_line()
 
         #-------------------------------------
         # Breakpoints
         #-------------------------------------
 
-        suppressMessages(library(segmented))
+ #       suppressMessages(library(segmented))
 
-        data.seg <- data.frame(x=as.numeric(var.med[var.med$site == st &
-                                     var.med$variable == "no", "date"]),
-                               y=var.med[var.med$site == st &
-                                     var.med$variable == "no", names.df])
+ #       data.seg <- data.frame(x=as.numeric(var.med[var.med$site == st &
+ #                                    var.med$variable == "no", "date"]),
+ #                              y=var.med[var.med$site == st &
+ #                                    var.med$variable == "no", names.df])
 
-        my.seg <- segmented(lm(y ~ x + 1, data=data.seg),
-                            seg.Z = ~ x,
-                            psi = list(x = as.numeric(periods[2:5]))
-                            )
+ #       my.seg <- segmented(lm(y ~ x + 1, data=data.seg),
+ #                           seg.Z = ~ x,
+ #                           psi = list(x = as.numeric(periods[2:5]))
+ #                           )
 
-        if (length(my.seg$psi) > 0) {
-            for (k in 1:(nrow(my.seg$psi))) {
-                plot.AQ <- plot.AQ + geom_vline(xintercept = my.seg$psi[k,"Est."],
-                                        linetype=5, color = "red", size=1.5)
-                plot.AQ <- plot.AQ + geom_vline(xintercept = my.seg$psi[k,"Est."] - my.seg$psi[k,"St.Err"],
-                                        linetype=5, color = "orange", size=1)
-                plot.AQ <- plot.AQ + geom_vline(xintercept = my.seg$psi[k,"Est."] + my.seg$psi[k,"St.Err"],
-                                        linetype=5, color = "orange", size=1)
-            }
-        }
+ #       if (length(my.seg$psi) > 0) {
+ #           for (k in 1:(nrow(my.seg$psi))) {
+ #               plot.AQ <- plot.AQ + geom_vline(xintercept = my.seg$psi[k,"Est."],
+ #                                       linetype=5, color = "red", size=1.5)
+ #               plot.AQ <- plot.AQ + geom_vline(xintercept = my.seg$psi[k,"Est."] - my.seg$psi[k,"St.Err"],
+ #                                       linetype=5, color = "orange", size=1)
+ #               plot.AQ <- plot.AQ + geom_vline(xintercept = my.seg$psi[k,"Est."] + my.seg$psi[k,"St.Err"],
+ #                                       linetype=5, color = "orange", size=1)
+ #           }
+ #       }
 
         #-------------------------------------
         # Guardar grafica como imagen
