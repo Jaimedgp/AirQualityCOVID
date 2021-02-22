@@ -19,11 +19,6 @@
 suppressMessages(library(lubridate))
 suppressMessages(library(tidyverse))
 
-
-setwd("~/Repositories/AirQualityCOVID")
-source("src/general.R")
-
-
 have.2020 <- function(dataFrame, start_dt = ymd("2020-01-01"),
                                  end_dt = ymd("2020-06-30")) {
 
@@ -54,62 +49,46 @@ get.missing <- function(dataFrame, unit="week",
                        "year" = 3600*24*365
                        )
 
-    new.df <- group.by.date(dataFrame, unit=unit, FUN=mean)
+    new.df <- group.by.date(list(value=dataFrame$value),
+                            list(date=dataFrame$date),
+                            dataFrame, unit=unit, FUN=mean)
     period <- (interval(round_date(start_dt, unit=unit),
                         round_date(end_dt, unit=unit)
                        )
                / conversion[[unit]])
 
 
-    amount <- as.integer(period) - sum(!is.na(new.df$x))
-    amount
+    as.integer(period) - sum(!is.na(new.df$date))
 }
 
 
-main <- function(sites.lv, pollutants.lv,
-                 min.interval, start_dt, end_dt, data.fldr) {
-    all.info <- data.frame()
-    i <- 1
+info_sitesAQ <- function(pollut, st, start_dt, end_dt) {
+    dataAQPLL <- get.AQdata(site=st, pollutant=pollut,
+                                start_dt = start_dt, end_dt=end_dt,
+                                data.by.file=FALSE)
 
-    for (st in sites.lv) {
-        for (pll in pollutants.lv) {
+        if (nrow(dataAQPLL) > 0) {
+            start_yr <- as_date(min(dataAQPLL$date))
+            end_yr <- as_date(max(dataAQPLL$date))
 
-            # Obtain dataframe
-            dataAQPLL <- get.AQdata(site=st, pollutant=pll,
-                                    start_dt = start_dt, end_dt=end_dt,
-                                    data.by.file=TRUE, fileName=data.fldr)
+            hv.min <- have.2020(dataAQPLL)
 
-            if (nrow(dataAQPLL) > 0) {
-                start_yr <- as_date(min(dataAQPLL$date))
-                end_yr <- as_date(max(dataAQPLL$date))
+            mss.wk <- get.missing(dataAQPLL, unit="week")
+            mss.mnth <- get.missing(dataAQPLL, unit="month")
+            mss.yr <- get.missing(dataAQPLL, unit="year")
 
-                hv.min <- have.2020(dataAQPLL, start_dt = min.interval[1],
-                                               end_dt = min.interval[2])
-
-                mss.wk <- get.missing(dataAQPLL, unit="week",
-                                                 start_dt = start_dt,
-                                                 end_dt = end_dt)
-                mss.mnth <- get.missing(dataAQPLL, unit="month",
-                                                   start_dt = start_dt,
-                                                   end_dt = end_dt)
-                mss.yr <- get.missing(dataAQPLL, unit="year",
-                                                 start_dt = start_dt,
-                                                 end_dt = end_dt)
-
-                new.row <- data.frame(site=st, Pollutant=pll,
-                                      start_yr, end_yr,
-                                      hv.min, mss.wk, mss.mnth, mss.yr)
-                all.info <- rbind(new.row, all.info)
-            }
+            new.row <- data.frame(site=st, Pollutant=pollut,
+                                  start_yr, end_yr,
+                                  hv.min, mss.wk, mss.mnth, mss.yr)
+            new.row
         }
-        print(paste(i, length(sites.lv), sep="/"))
-        i <- i+1
-    }
-    all.info
 }
 
 
-if(!interactive()) {
+
+if(interactive()) {
+
+    setwd("~/Repositories/AirQualityCOVID")
 
     min.interval <- c(ymd("2020-01-01"),
                       ymd("2020-06-30"))
@@ -118,16 +97,21 @@ if(!interactive()) {
     end_dt <- ymd("2020-12-30")
 
     # Get sites of study
-    all.sites <- read.csv("data/Curation/sitesAQ.csv",
+    all.sites <- read.csv("data/Curation/AirQuality/sitesAQ.csv",
                       stringsAsFactor=TRUE)
-    sites.lv <- levels(all.sites$site)
+    sites.lv <- levels(all.sites$site)[1:2]
     pollutants.lv <- c("no", "no2", "o3", "pm10", "pm2.5")
 
+    all.info <- do.call(rbind.fill,
+                        lapply(sites.lv,
+                               function(st, polluts){
+                                   do.call(rbind.fill,
+                                           lapply(polluts,
+                                                  info_sitesAQ,
+                                                  st, ymd("2013-01-01"),
+                                                  ymd("2020-12-31"))
+                                           )
+                               }, pollutants.lv))
 
-    all.info <- main(sites.lv, pollutants.lv,
-                     min.interval, start_dt, end_dt,
-                     data.fldr="data/Curation/dataAQ/"
-                     )
-
-    write.csv(all.info, "data/Curation/info_sitesAQ.csv", row.names=FALSE)
+    #write.csv(all.info, "data/Curation/info_sitesAQ.csv", row.names=FALSE)
 }
