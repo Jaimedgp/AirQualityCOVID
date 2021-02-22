@@ -31,37 +31,3 @@ group.by.date <- function(df, unit="day", FUN="mean") {
 
     aggregate(df$value, by=list(df$date, df$variable), FUN, rm.na=TRUE)
 }
-
-
-get.AQdata <- function(site="", pollutant, start_dt, end_dt,
-                       data.by.file=FALSE, fileName="../data/curation/dataAQ/") {
-    # Obtain air quiality data of site station.
-    #
-    # Data can be obtain from file (data.by.file = TRUE)
-    #     or downloaded from saqgetr (data.by.file = FALSE)
-
-    fileName <- paste(fileName, site, ".csv", sep="")
-
-    if (data.by.file & sum(file.exists(fileName)) == 2) {
-        data.AQ <- data.frame()
-
-        for (fl in fileName) {
-            data.AQ <- rbind(data.AQ,
-                             read.csv(fl, stringsAsFactor=FALSE) %>%
-                                filter(variable %in% pollutant) %>%
-                                date.as.datetime() %>%
-                                filter(year(date) >= start_dt & year(date) <= end_dt)
-                            )
-        }
-    } else {
-        suppressMessages(data.AQ <- get_saq_observations(
-            site = site,
-            variable = pollutant,
-            start = start_dt,
-            end = end_dt,
-            valid_only = TRUE,
-            verbose = TRUE
-        ))
-    }
-    data.AQ
-}
