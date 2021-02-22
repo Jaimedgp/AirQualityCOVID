@@ -41,7 +41,7 @@ sitesAQ <- get.spain.sites(start_dt)
 
 # Obtener que estaciones tienen los datos necesarios
 all.info <- do.call(rbind.fill,
-                    lapply(levels(as.factor(sitesAQ$site))[1:3],
+                    lapply(levels(as.factor(sitesAQ$site)),
                            function(st, polluts){
                                do.call(rbind.fill,
                                        lapply(polluts,
