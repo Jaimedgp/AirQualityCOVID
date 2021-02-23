@@ -86,3 +86,41 @@ group.by.date <- function(valueList, byList, dataFrame, unit="day", FUN="mean") 
               by=byList,
               FUN=FUN, rm.na=TRUE)
 }
+
+
+pivot.short.table <- function(df, cols) {
+    cmn.nm <- names(df)[-which(names(df) %in% cols)]
+    new.df <- data.frame()
+
+    for (cl in cols) {
+        new.row <- cbind(df[, cmn.nm],
+                         variable=rep(cl, nrow(df)),
+                         value=df[, cl])
+        new.df <- rbind(new.df,
+                        new.row)
+    }
+
+    new.df
+}
+
+
+pivot.long.table <- function(df, valueCl, variableCl) {
+    cmn.nm <- names(df)[-which(names(df) %in% c(valueCl, variableCl))]
+    lv <- levels(as.factor(df[, variableCl]))
+
+    new.df <- cbind(df[df[, variableCl] == lv[1], cmn.nm],
+                    df[df[, variableCl] == lv[1], valueCl])
+    names(new.df)[ncol(new.df)] <- lv[1]
+
+    for (l in lv[2:length(lv)]) {
+        new.row <- df[df[, variableCl] == l, ]
+
+        new.df <- merge(new.df,
+                        cbind(new.row[, cmn.nm],
+                              new.row[, valueCl]),
+                        by=cmn.nm, all = T
+                        )
+        names(new.df)[ncol(new.df)] <- l
+    }
+    new.df
+}
