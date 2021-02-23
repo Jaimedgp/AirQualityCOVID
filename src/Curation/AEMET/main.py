@@ -28,33 +28,36 @@ def download_nearest_data(df_row):
     """ Download AEMET meteo data from the nearest station to the air quality
         station.  """
 
-    nearest_station = Aemet.get_nearest_stations(lat=df_row["latitude"],
-                                                 long=df_row["longitude"],
-                                                 near=3)
+    station = []
+    n_station = Aemet.get_nearest_stations(lat=df_row["latitude"],
+                                           long=df_row["longitude"],
+                                           near=3)
+    n_station["siteAQ"] = df_row["site"]
 
-    for i, (st, lat, long) in enumerate(
-                                    zip(nearest_station["indicativo"].values,
-                                        nearest_station["latitud"].values,
-                                        nearest_station["longitud"].values)):
-
+    for i, st in enumerate(n_station["indicativo"].values):
         all_data = Aemet.get_data(dates=[date(2013, 1, 1),
                                          date(2020, 12, 31)],
                                   station_id=st,
                                   )
 
         if all_data is not None:
-            all_data["siteAQ"] = df_row["site"]
-            all_data["latitud"] = lat
-            all_data["longitud"] = long
+            station.append(i)
 
-            all_data.to_csv(HOME+"data/Curation/AEMET/Values/%s-%s.csv"
-                            %(df_row["site"], i), index=False)
+            all_data.to_csv(HOME+"data/Curation/AEMET/Values/%s.csv"
+                            % (st), index=False)
+
+    return n_station.iloc[station]
 
 
 # ----------------------------------------
 #     ESTACIONES CALIDAD DEL AIRE
 # ----------------------------------------
 
-sites_AQ = pd.read_csv(HOME+"data/Curation/AirQuality/sitesAQ.csv")
+sites_AQ = pd.read_csv(HOME+"data/Curation/AirQuality/sitesAQ.csv")[:1]
 
-sites_AQ.apply(download_nearest_data, axis=1)
+all_station_info = [download_nearest_data(row)
+                    for i, row in sites_AQ.iterrows()]
+
+pd.concat(all_station_info,
+          axis=0).to_csv(HOME+"data/Curation/AEMET/sites_AEMET.csv",
+                         index=False)
