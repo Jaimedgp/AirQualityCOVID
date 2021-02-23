@@ -56,8 +56,6 @@ get.spain.sites <- function(start_dt,
                       by.x = "site", by.y="Código.estación",
                       all.x = TRUE)
 
-    write.csv(sites.AQ, to.save, row.names=FALSE)
-
     sites.AQ
 }
 
@@ -70,5 +68,5 @@ if(interactive()) {
     start_dt <- ymd_hms("2013-01-01 00:00:00")
 
     get.spain.sites(start_dt)
-    print("HOLA")
+    write.csv(sites.AQ, to.save, row.names=FALSE)
 }
