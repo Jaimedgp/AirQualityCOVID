@@ -26,7 +26,7 @@ data.as.datetime <- function(dataframe, column, FUN){
 
 
 get.AQdata <- function(site, pollutant, start_dt, end_dt=NA,
-                       data.by.file=FALSE, fileName="../data/Curation/AirQuality/dataAQ/") {
+                       data.by.file=FALSE, fileName="data/Curation/AirQuality/Values/") {
     #-------------------------------------------------------------------
     # Obtain air quiality data of site station.
     #
@@ -47,8 +47,9 @@ get.AQdata <- function(site, pollutant, start_dt, end_dt=NA,
             data.AQ <- rbind(data.AQ,
                              read.csv(fl, stringsAsFactor=FALSE) %>%
                                 filter(variable %in% pollutant) %>%
-                                date.as.datetime("date", "ymd_hms") %>%
-                                filter(year(date) >= start_dt & year(date) <= end_dt)
+                                data.as.datetime("date", "ymd_hms") %>%
+                                filter(year(date) >= year(start_dt) &
+                                       year(date) <= year(end_dt))
                             )
         }
     } else {

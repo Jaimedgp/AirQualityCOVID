@@ -31,7 +31,7 @@ def download_nearest_data(df_row):
     station = []
     n_station = Aemet.get_nearest_stations(lat=df_row["latitude"],
                                            long=df_row["longitude"],
-                                           near=3)
+                                           near=10)
     n_station["siteAQ"] = df_row["site"]
 
     for i, st in enumerate(n_station["indicativo"].values):
@@ -53,7 +53,7 @@ def download_nearest_data(df_row):
 #     ESTACIONES CALIDAD DEL AIRE
 # ----------------------------------------
 
-sites_AQ = pd.read_csv(HOME+"data/Curation/AirQuality/sitesAQ.csv")[:1]
+sites_AQ = pd.read_csv(HOME+"data/Curation/AirQuality/checked_sitesAQ.csv")
 
 all_station_info = [download_nearest_data(row)
                     for i, row in sites_AQ.iterrows()]

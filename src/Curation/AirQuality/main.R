@@ -48,9 +48,9 @@ all.info <- do.call(rbind.fill,
                                               info_sitesAQ,
                                               st, start_dt, end_dt))
                            }, pollutants))
-all.info  <- mutate_if(all.info, is.factor, as.character)
 write.csv(all.info,
           "data/Curation/AirQuality/info_sitesAQ.csv", row.names=FALSE)
+all.info  <- mutate_if(all.info, is.factor, as.character)
 
 #--------------------------------------
 # Filtrar con los datos validos
@@ -63,20 +63,4 @@ valid.info <- all.info[all.info$hv.min == TRUE &
 valid.info <- valid.info[valid.info$mss.yr < 5,]
 
 write.csv(sitesAQ[sitesAQ$site %in% levels(as.factor(valid.info$site)),],
-          "data/Curation/AirQuality/sitesAQ.csv", row.names=FALSE)
-
-#-------------------
-# descargar datos
-#-------------------
-for (st in levels(as.factor(valid.info$site))) {
-
-    data.st <- do.call(rbind,
-                       lapply(levels(as.factor(valid.info[valid.info$site == st,
-                                                          "Pollutant"])),
-                              get.AQdata,
-                              site=st, start_dt=start_dt, end_dt=NA,
-                              data.by.file=FALSE, fileName=""))
-    write.csv(data.st,
-              paste("data/Curation/AirQuality/Values/",
-                    st, ".csv", sep=""), row.names=FALSE)
-}
+          "data/Curation/AirQuality/checked_sitesAQ.csv", row.names=FALSE)

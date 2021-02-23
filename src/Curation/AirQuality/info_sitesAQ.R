@@ -32,7 +32,7 @@ have.2020 <- function(dataFrame, start_dt = ymd("2020-01-01"),
 
 
 get.missing <- function(dataFrame, unit="week",
-                                   start_dt=ymd("2010-01-01"),
+                                   start_dt=ymd("2013-01-01"),
                                    end_dt=ymd("2020-12-31")) {
 
     conversion <- list("hour" = 3600,
@@ -56,9 +56,9 @@ get.missing <- function(dataFrame, unit="week",
 
 
 info_sitesAQ <- function(pollut, st, start_dt, end_dt) {
-    dataAQPLL <- get.AQdata(site=st, pollutant=pollut,
-                                start_dt = start_dt, end_dt=end_dt,
-                                data.by.file=FALSE)
+    dataAQPLL <- get.AQdata(site=st, pollutant=pollut, start_dt = start_dt,
+                            end_dt=end_dt, data.by.file=TRUE,
+                            fileName="data/Curation/AirQuality/Values/")
 
         if (nrow(dataAQPLL) > 0) {
             start_yr <- as_date(min(dataAQPLL$date))
@@ -66,9 +66,12 @@ info_sitesAQ <- function(pollut, st, start_dt, end_dt) {
 
             hv.min <- have.2020(dataAQPLL)
 
-            mss.wk <- get.missing(dataAQPLL, unit="week")
-            mss.mnth <- get.missing(dataAQPLL, unit="month")
-            mss.yr <- get.missing(dataAQPLL, unit="year")
+            mss.wk <- get.missing(dataAQPLL, unit="week",
+                                  start_dt, end_dt)
+            mss.mnth <- get.missing(dataAQPLL, unit="month",
+                                    start_dt, end_dt)
+            mss.yr <- get.missing(dataAQPLL, unit="year",
+                                  start_dt, end_dt)
 
             new.row <- data.frame(site=st, Pollutant=pollut,
                                   start_yr, end_yr,
