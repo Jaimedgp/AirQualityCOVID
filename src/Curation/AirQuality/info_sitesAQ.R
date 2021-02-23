@@ -22,19 +22,12 @@ suppressMessages(library(tidyverse))
 have.2020 <- function(dataFrame, start_dt = ymd("2020-01-01"),
                                  end_dt = ymd("2020-06-30")) {
 
-    if (as_date(min(dataFrame$date)) > start_dt) {
-        boolean <- FALSE
-    } else if (as_date(max(dataFrame$date)) < end_dt) {
-        boolean <- FALSE
-    } else {
-        new.df <- dataFrame[dataFrame$date >= start_dt &
-                            dataFrame$date <= end_dt, ]
+    new.df <- dataFrame[dataFrame$date >= start_dt &
+                        dataFrame$date <= end_dt, ]
 
-        amount.data <- (sum(!is.na(new.df$value)) / length(new.df$value))
+    amount.data <- (sum(!is.na(new.df$value)) / length(new.df$value))
 
-        boolean <- amount.data >= 0.9
-    }
-    boolean
+    amount.data >= 0.9
 }
 
 
