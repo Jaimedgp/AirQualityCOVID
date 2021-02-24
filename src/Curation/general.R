@@ -53,6 +53,7 @@ get.AQdata <- function(site, pollutant, start_dt, end_dt=NA,
                             )
         }
     } else {
+        print("Download")
         suppressMessages(data.AQ <- get_saq_observations(
             site = site,
             variable = pollutant,
@@ -112,15 +113,17 @@ pivot.long.table <- function(df, valueCl, variableCl) {
                     df[df[, variableCl] == lv[1], valueCl])
     names(new.df)[ncol(new.df)] <- lv[1]
 
-    for (l in lv[2:length(lv)]) {
-        new.row <- df[df[, variableCl] == l, ]
+    if (length(lv) > 1) {
+        for (l in lv[2:length(lv)]) {
+            new.row <- df[df[, variableCl] == l, ]
 
-        new.df <- merge(new.df,
-                        cbind(new.row[, cmn.nm],
-                              new.row[, valueCl]),
-                        by=cmn.nm, all = T
-                        )
-        names(new.df)[ncol(new.df)] <- l
+            new.df <- merge(new.df,
+                            cbind(new.row[, cmn.nm],
+                                new.row[, valueCl]),
+                            by=cmn.nm, all = T
+                            )
+            names(new.df)[ncol(new.df)] <- l
+        }
     }
     new.df
 }
