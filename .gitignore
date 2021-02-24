@@ -53,6 +53,7 @@ presentations/*/*.synctex.gz
 
 # Huge amount of data
 data/Curation/*/Values/*.csv
+data/Curation/Values/*.csv
 
 # Bibliography
 Bibliografia/
