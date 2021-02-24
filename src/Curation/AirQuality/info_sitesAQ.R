@@ -19,15 +19,19 @@
 suppressMessages(library(lubridate))
 suppressMessages(library(tidyverse))
 
-have.2020 <- function(dataFrame, start_dt = ymd("2020-01-01"),
-                                 end_dt = ymd("2020-06-30")) {
+have.2020 <- function(dataFrame, start_dt = ymd("2020-03-01"),
+                                 end_dt = ymd("2020-05-01")) {
 
     new.df <- dataFrame[dataFrame$date >= start_dt &
                         dataFrame$date <= end_dt, ]
+    period <- as.integer(interval(round_date(start_dt, unit="hour"),
+                                  round_date(end_dt, unit="hour")
+                                  )
+                         / 3600)
 
-    amount.data <- (sum(!is.na(new.df$value)) / length(new.df$value))
+    amount.data <- (sum(!is.na(new.df$value)) / period)
 
-    amount.data >= 0.9
+    amount.data >= 0.8
 }
 
 
