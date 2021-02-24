@@ -62,5 +62,10 @@ valid.info <- all.info[all.info$hv.min == TRUE &
 
 valid.info <- valid.info[valid.info$mss.yr < 5,]
 
-write.csv(sitesAQ[sitesAQ$site %in% levels(as.factor(valid.info$site)),],
+checked_sitesAQ <- merge(x = valid.info %>%
+                                select(site, Pollutant),
+                         y = sitesAQ,
+                         by = "site", all.x = T, all.y=F)
+
+write.csv(checked_sitesAQ,
           "data/Curation/AirQuality/checked_sitesAQ.csv", row.names=FALSE)
