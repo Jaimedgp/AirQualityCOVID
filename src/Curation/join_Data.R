@@ -38,6 +38,16 @@ sitesAQ <- read.csv("data/Curation/AirQuality/checked_sitesAQ.csv",
 sitesMto <- read.csv("data/Curation/AEMET/checked_sites_AEMET.csv",
                      stringsAsFactor=F)
 
+rh.ERA5.Land <- read.csv(paste("data/Curation/ERA5-Land/Values/",
+                               "rh_daily_2010_2020_final_stations.csv",
+                               sep=""),
+                         stringsAsFactor=F)%>% data.as.datetime("dates", "ymd")
+
+ssrd.ERA5.Land <- read.csv(paste("data/Curation/ERA5-Land/Values/",
+                                 "ssrd_daily_2010_2020_final_stations.csv",
+                                 sep=""),
+                           stringsAsFactor=F)%>% data.as.datetime("dates", "ymd")
+
 
 ##############################
 # Ejecucion del Programa
@@ -45,6 +55,7 @@ sitesMto <- read.csv("data/Curation/AEMET/checked_sites_AEMET.csv",
 
 site.lv <- levels(as.factor(sitesAQ$site))
 for (st in site.lv) {
+    print(st)
     pll <- sitesAQ[sitesAQ$site == st, "Pollutant"]
     dataAQ <- get.AQdata(st, pll, start_dt=start_dt, end_dt=end_dt,
                          data.by.file=TRUE,
@@ -73,6 +84,20 @@ for (st in site.lv) {
 
     data.st <- merge(dataAQ, dataMto,
                      by.x="date", by.y="fecha", all.x = T)
+
+    if (st %in% names(rh.ERA5.Land)) {
+        data.st <- merge(data.st, rh.ERA5.Land[, c("dates", st)],
+                        by.x="date", by.y="dates",
+                        all.x = T
+                        )
+        names(data.st)[ncol(data.st)] <- "RH"
+
+        data.st <- merge(data.st, ssrd.ERA5.Land[, c("dates", st)],
+                        by.x="date", by.y="dates",
+                        all.x = T
+                        )
+        names(data.st)[ncol(data.st)] <- "Solar.radiation"
+    }
 
     comun.nm <- c("date", "site", "indicativo")
     variable.nm <- names(data.st)[-which(names(data.st) %in% comun.nm)]
