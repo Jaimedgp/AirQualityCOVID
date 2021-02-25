@@ -22,7 +22,12 @@ suppressMessages(library(tidyverse))
 suppressMessages(library(openxlsx))
 suppressMessages(library(plyr))
 
-source("functions.R")
+source.file <- "functions.R"
+if (!file.exists(source.file)) {
+    source.file <- paste("src/Curation/", source.file, sep="")
+}
+source(source.file)
+
 
 #----------------------------------------------
 # date time Conversion from seconds used in
@@ -187,8 +192,9 @@ main.curation <- function(pair.st.pll, study.prd, main.prd, minPercentage){
 }
 
 
-if(!interactive()) {
+if(sys.nframe() == 0) {
 
+    print("Executing main...")
     setwd("~/Repositories/AirQualityCOVID")
 
     #--------------------------
