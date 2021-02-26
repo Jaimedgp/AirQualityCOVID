@@ -67,6 +67,6 @@ Bibliografia/
 */__pycache__/
 */*/*/__pycache__/
 
-src/Curation/AEMET/apikey_file.py
+src/Curation/meteo/apikey_file.py
 
 notebooks/Tests/
