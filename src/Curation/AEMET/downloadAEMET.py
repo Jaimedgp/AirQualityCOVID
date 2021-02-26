@@ -141,8 +141,9 @@ class DownloadAEMET():
         sites = requests.get(to_obtain["datos"],
                              {'accept': 'application/json'}).json()
 
-        file = save_json(sites, file_name)
-        self.stations = pd.read_json(file)
+        self.stations = pd.DataFrame.from_dict(sites)
+        #file = save_json(sites, file_name)
+        #self.stations = pd.read_json(file)
         self.stations["latitud"] = self.stations.apply(
             lambda df:
             convert_coordiantes(df["latitud"]),
@@ -194,8 +195,9 @@ class DownloadAEMET():
             else:
                 return None
 
-        file = save_json(data, json_name)
-        data_pd = pd.read_json(file).replace({"Ip": 0,
+        #file = save_json(data, json_name)
+        #data_pd = pd.read_json(file)
+        data_pd = pd.DataFrame.from_dict(data) .replace({"Ip": 0.05,
                                               "Varias": -2})
 
         dataframe = dot_decimals(data_pd)
