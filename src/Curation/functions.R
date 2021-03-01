@@ -2,7 +2,6 @@
 #               Data Processing Functions
 #
 # General functions used to load and transform data for curation.
-#     - data.as.datetime: Convert date column into datetime format
 #     - get.AQdata: Load air quality data
 #     - group.by.date: Change Date resolution
 #
@@ -13,27 +12,7 @@
 suppressMessages(library(saqgetr))
 suppressMessages(library(lubridate))
 
-
-data.as.datetime <- function(dataframe, column, FUN){
-    # Converte date column into datetime format using lubridate package
-    #
-    # @params:
-    #     dataframe: dataframe with all data
-    #     column: name or names of date column
-    #     FUN: lubridate function to apply. Can be date ('ymd') or datetime ('ymd <- hms')
-    # @return:
-    #     dataframe: same dataframe with date column as datetime format
-
-    if (FUN == "ymd_hms") {
-        dataframe[, column] <- ymd_hms(dataframe[, column])
-    } else if (FUN == "ymd") {
-        dataframe[, column] <- ymd(dataframe[, column])
-    } else {
-        print("No valid FUN. Must be: 'ymd_hms' or 'ymd'")
-    }
-    dataframe
-}
-
+source("src/functions.R")
 
 get.AQdata <- function(site, pollutant,
                        start_dt, end_dt=NA, data.by.file=FALSE,
