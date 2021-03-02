@@ -37,15 +37,22 @@ data.as.datetime <- function(dataframe, column, FUN){
 pivot.short.table <- function(df, cols) {
     cmn.nm <- names(df)[-which(names(df) %in% cols)]
     new.df <- data.frame()
+    
+    if (length(cmn.nm) == 1) {
+        cmn.row <- data.frame(cmn.nm=df[, cmn.nm])
+    } else {
+        cmn.row <- df[, cmn.nm]
+    }
 
     for (cl in cols) {
-        new.row <- cbind(df[, cmn.nm],
-                         variable=rep(cl, nrow(df)),
+        
+        new.row <- cbind(cmn.row,
+                         variable=rep(cl, length(df[,cl])),
                          value=df[, cl])
         new.df <- rbind(new.df,
                         new.row)
     }
-
+    
     new.df
 }
 
