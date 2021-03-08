@@ -14,6 +14,28 @@ suppressMessages(library(lubridate))
 
 source("src/functions.R")
 
+
+sv.checkedAQ <- function(fileName="data/Curation/checked_AQ.csv") {
+    if (file.exists(fileName)) {
+        sites.data <- read.csv(fileName, stringsAsFactor=F)
+        data_AQ <- data.frame()
+
+        for (st in levels(as.factor(sites.data$site))) {
+            pll <- levels(as.factor(sites.data[sites.data$site == st,
+                                    "Pollutant"]))
+            data_AQ <- rbind(data_AQ,
+                              get.AQdata(st, pollutant=pll, start_dt=ymd("2020-01-01"))
+                              )
+        }
+        save(data_AQ, file="data/data_AQ.rda")
+    } else {
+        data_AQ <- NULL
+    }
+
+    data_AQ
+}
+
+
 get.AQdata <- function(site, pollutant,
                        start_dt, end_dt=NA, data.by.file=FALSE,
                        fileName="data/Curation/AirQuality/Values/") {
@@ -66,27 +88,4 @@ get.AQdata <- function(site, pollutant,
         ))
     }
     data.AQ
-}
-
-
-group.by.date <- function(formulation, dataFrame, dateCl, unit="day", FUN="mean") {
-    # Summarize data by date, changing the temporal resolution of the dataframe
-    #
-    # @params:
-    #     valueList: List with the columns to summarize.
-    #                e.g.: list(columnName=columnValues)
-    #     byList: List with date columns to change date resolution
-    #                e.g.: list(dateColumnName=dateColumnValues)
-    #     dataFrame: Dataframe with all data
-    #     unit: Target temporal resolution
-    #     FUN: Function by which aggrgation is done
-    # @return:
-    #     dataframe with temporal resolution changed
-
-    dataFrame[, dateCl] <- floor_date(dataFrame[, dateCl], unit=unit) # Change date resolution
-
-    aggregate(formulation, data=dataFrame, FUN=FUN, rm.na=TRUE)
-              #valueList,
-              #by=byList,
-              #FUN=FUN, rm.na=TRUE)
 }
