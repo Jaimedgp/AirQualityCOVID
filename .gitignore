@@ -50,23 +50,13 @@ presentations/*/*.bbl
 presentations/*/*.snm
 presentations/*/*.synctex.gz
 
-# Huge amount of data
-data/Curation/data*/*.csv
-data/Curation/data*.csv
 
 # Bibliography
 Bibliografia/
 
-# Old files
-./*/old/
-./*/*/old/
 
 # Python packages
 */__pycache__/
 */*/*/__pycache__/
 
-src/Curation/AEMET/apikey_file.py
-
-.ipynb_checkpoints/
-
-notebooks/Tests/
+src/Curation/meteo/apikey_file.py
