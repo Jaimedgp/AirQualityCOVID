@@ -3,8 +3,8 @@
 #
 # General functions use in the proyect
 #     - data.as.datetime: Convert date column into datetime format
-#     - pivot.short.table:
-#     - pivot.long.table:
+#     - get.AQdata: Load air quality data
+#     - sv.checkedAQ: Download AQ data from checked_AQ file
 #
 # @author Jaimedgp
 #################################################################
@@ -34,48 +34,85 @@ data.as.datetime <- function(dataframe, column, FUN){
 }
 
 
-pivot.short.table <- function(df, cols) {
-    cmn.nm <- names(df)[-which(names(df) %in% cols)]
-    new.df <- data.frame()
-    
-    if (length(cmn.nm) == 1) {
-        cmn.row <- data.frame(cmn.nm=df[, cmn.nm])
-    } else {
-        cmn.row <- df[, cmn.nm]
-    }
+get.AQdata <- function(site, pollutant,
+                       start_dt, end_dt=NA, data.by.file=FALSE,
+                       fileName="data/Curation/AirQuality/Values/") {
+    # Obtain annual air quiality data. Data can be obtained either from
+    #     file with previous downloaded data or from saqgetr function
+    #
+    # @params:
+    #     site: site code for air quality station. e.g.: "es0000a"
+    #     pollutant: pollutants from which to download
+    #                concentrations. e.g.: c("no2", "o3")
+    #     start_dt: Start date for returned observations. if start_dt
+    #               is a date, its year is taken as start date.
+    #     end_dt: End date for returned observations. if end_dt
+    #             is a date, its year is taken as end date.
+    #     data.by.file: Boolean with the condition if the data
+    #                   is taken from the file.
+    #     fileName: Path of the downloaded data files from where the
+    #               data is loaded if data.by.file is true
+    # @return:
+    #     data.AQ: dataframe with air quality data
 
-    for (cl in cols) {
-        
-        new.row <- cbind(cmn.row,
-                         variable=rep(cl, length(df[,cl])),
-                         value=df[, cl])
-        new.df <- rbind(new.df,
-                        new.row)
+    fileName <- paste(fileName, site, ".csv", sep="")
+
+    if (data.by.file & sum(file.exists(fileName)) == length(site)) {
+        data.AQ <- data.frame()
+
+        if (is.na(end_dt)) {
+            end_dt <- Sys.Date()
+        }
+
+        for (fl in fileName) {
+            data.AQ <- rbind(data.AQ,
+                             read.csv(fl, stringsAsFactor=FALSE) %>%
+                                filter(variable %in% pollutant) %>%
+                                data.as.datetime("date", "ymd_hms") %>%
+                                filter(year(date) >= year(start_dt) &
+                                       year(date) <= year(end_dt))
+                            )
+        }
+    } else {
+        print("Downloading...")
+
+        suppressMessages(data.AQ <- get_saq_observations(
+            site = site,
+            variable = pollutant,
+            start = start_dt,
+            end = end_dt,
+            valid_only = TRUE,
+            verbose = TRUE
+        ))
     }
-    
-    new.df
+    data.AQ
 }
 
 
-pivot.long.table <- function(df, valueCl, variableCl) {
-    cmn.nm <- names(df)[-which(names(df) %in% c(valueCl, variableCl))]
-    lv <- levels(as.factor(df[, variableCl]))
+sv.checkedAQ <- function(fileName="data/Curation/checked_AQ.csv") {
+    # Download Air quality using checked_AQ information to download
+    #      only useful data. Save it in a .rda file
+    #
+    # @params:
+    #     fileName: Path to checked_AQ file
+    # @return:
+    #     data_AQ: dataframe with all air quality data
 
-    new.df <- cbind(df[df[, variableCl] == lv[1], cmn.nm],
-                    df[df[, variableCl] == lv[1], valueCl])
-    names(new.df)[ncol(new.df)] <- lv[1]
+    if (file.exists(fileName)) {
+        sites.data <- read.csv(fileName, stringsAsFactor=F)
+        data_AQ <- data.frame()
 
-    if (length(lv) > 1) {
-        for (l in lv[2:length(lv)]) {
-            new.row <- df[df[, variableCl] == l, ]
-
-            new.df <- merge(new.df,
-                            cbind(new.row[, cmn.nm],
-                                new.row[, valueCl]),
-                            by=cmn.nm, all = T
-                            )
-            names(new.df)[ncol(new.df)] <- l
+        for (st in levels(as.factor(sites.data$site))) {
+            pll <- levels(as.factor(sites.data[sites.data$site == st,
+                                    "Pollutant"]))
+            data_AQ <- rbind(data_AQ,
+                              get.AQdata(st, pollutant=pll, start_dt=ymd("2020-01-01"))
+                              )
         }
+        save(data_AQ, file="data/data_AQ.rda")
+    } else {
+        data_AQ <- NULL
     }
-    new.df
+
+    data_AQ
 }
