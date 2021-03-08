@@ -21,6 +21,7 @@ suppressMessages(library(lubridate))
 suppressMessages(library(tidyverse))
 suppressMessages(library(openxlsx))
 suppressMessages(library(plyr))
+suppressMessages(library(openair))
 
 source.file <- "functions.R"
 if (!file.exists(source.file)) {
@@ -96,19 +97,25 @@ have.min <- function(dataFrame, study.prd, minPercentage=0.8, unit="hour") {
     #     Boolean if dataframe has enough data in main study period
 
     new.df <- dataFrame[dataFrame$date >= study.prd[1] &
-                        dataFrame$date <= study.prd[2], ] %>%
-                    group.by.date(formulation=value ~ date,
-                                  dateCl="date", unit=unit, FUN=mean)
+                        dataFrame$date <= study.prd[2], ]
+    if (nrow(new.df) > 0) {
+        new.df <- timeAverage(new.df, avg.time = unit, type=c("variable", "site"))
 
-    # num of hours in main study period
-    period <- as.integer(interval(round_date(study.prd[1], unit=unit),
-                                  round_date(study.prd[2], unit=unit)
-                                  )
-                         / conversion[[unit]])
+        # num of hours in main study period
+        period <- as.integer(interval(round_date(study.prd[1], unit=unit),
+                                    round_date(study.prd[2], unit=unit)
+                                    )
+                            / conversion[[unit]])
 
-    amount.data <- (sum(!is.na(new.df$value)) / period)
+        amount.data <- (sum(!is.na(new.df$value)) / period)
 
-    amount.data >= minPercentage
+        boolean <- amount.data >= minPercentage
+    } else {
+        boolean <- FALSE
+    }
+
+    boolean
+
 }
 
 
@@ -124,9 +131,8 @@ get.missing <- function(dataFrame, unit="week",
     # @return:
     #     Numer of units missing in study time
 
-    new.df <- group.by.date(formulation=value ~ date,
-                            dataFrame=dataFrame, dateCl = "date",
-                            unit=unit, FUN=mean)
+    new.df <- timeAverage(dataFrame, avg.time=unit, type=c("variable", "site"))
+
     period <- (interval(round_date(start_dt, unit=unit),
                         round_date(end_dt, unit=unit)
                        )
