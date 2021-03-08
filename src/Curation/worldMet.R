@@ -19,7 +19,6 @@ suppressMessages(library(lubridate))
 suppressMessages(library(openair))
 
 
-
 if(sys.nframe() == 0) {
 
     print("Executing main...")
