@@ -25,7 +25,7 @@ suppressMessages(library(openair))
 
 source.file <- "functions.R"
 if (!file.exists(source.file)) {
-    source.file <- paste("src/Curation/", source.file, sep="")
+    source.file <- paste("src/", source.file, sep="")
 }
 source(source.file)
 
@@ -271,5 +271,7 @@ if(sys.nframe() == 0) {
     #------------------------------
 
     write.csv(valid.info,
-              "data/Curation/AirQuality/checked_sitesAQ.csv", row.names=FALSE)
+              "data/Curation/checked_AQ.csv", row.names=FALSE)
+
+    sv.checkedAQ("data/Curation/checked_AQ.csv")
 }
