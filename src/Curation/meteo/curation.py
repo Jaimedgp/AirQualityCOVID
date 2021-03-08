@@ -8,6 +8,8 @@
 """
 
 
+import os
+
 import pandas as pd
 
 
@@ -92,13 +94,17 @@ def download_nearest_data(aemet, siteAQ, stdy_prd, remove_cl,
     n_station["siteAQ"] = siteAQ["site"]
 
     for i, st in enumerate(n_station["indicativo"].values):
+        if os.path.isfile(folder+st+".csv"):
+            station = n_station.iloc[i].to_frame().T
+            break
+
         all_data = aemet.get_data(dates=stdy_prd,
                                   station_id=st,
                                   )
 
         if all_data is not None:
             names = [nm for nm in all_data.columns
-                    if nm not in remove_cl]
+                     if nm not in remove_cl]
 
             prop_info = get_proportion_info(all_data[names], stdy_prd)
 
@@ -142,7 +148,7 @@ if __name__ == '__main__':
     # ------------------------------
 
     study_prd = [date(2013, 1, 1), date(2020, 12, 31)]
-    num_stations = 3
+    num_stations = 10
     min_proportion = 0.8
 
     folder_vl = HOME+"data/Curation/AEMET/Values/"
@@ -164,7 +170,7 @@ if __name__ == '__main__':
     #      Save Curated data
     # ------------------------------
 
-    file_st = HOME+"data/Curation/AEMET/sites_AEMET.csv"
+    file_st = HOME+"data/Curation/checked_AEMET.csv"
 
     pd.concat(all_station_info,
               axis=0, ignore_index=True).to_csv(file_st, index=False)
