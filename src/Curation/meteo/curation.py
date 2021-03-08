@@ -65,7 +65,7 @@ def is_enough_data(proportion_info, min_prop):
     return (proportion_info.iloc[:, 4:] > min_prop).all(axis=1)[0]
 
 
-def download_nearest_data(aemet, siteAQ, stdy_prd, remove_cl,
+def download_nearest_data(aemet, siteAQ, stdy_prd, remove_cl, selected_cl,
                           folder, n=3, min_prop=0.8):
     """
         Download AEMET meteo data from the nearest station to the air
@@ -78,6 +78,7 @@ def download_nearest_data(aemet, siteAQ, stdy_prd, remove_cl,
             study_prd: list with start and end dates of study.
                        e.g.: [start_dt, end_dt]
             removed_cl: Columns names that should be removed for the study
+            removed_cl: Columns names that should be selected for the study
             folder: Folder path where files are saved
 
             n: Number of nearest stations to try to download. Default: 3
@@ -103,16 +104,19 @@ def download_nearest_data(aemet, siteAQ, stdy_prd, remove_cl,
                                   )
 
         if all_data is not None:
-            names = [nm for nm in all_data.columns
-                     if nm not in remove_cl]
+            min_names = [nm for nm in all_data.columns
+                         if nm in selected_cl]
+            if len(min_names) == len(selected_cl):
+                names = [nm for nm in all_data.columns
+                        if nm not in remove_cl]
 
-            prop_info = get_proportion_info(all_data[names], stdy_prd)
+                prop_info = get_proportion_info(all_data[names], stdy_prd)
 
-            if is_enough_data(prop_info, min_prop):
-                all_data.to_csv(folder+st+".csv", index=False)
+                if is_enough_data(prop_info, min_prop):
+                    all_data.to_csv(folder+st+".csv", index=False)
 
-                station = n_station.iloc[i].to_frame().T
-                break
+                    station = n_station.iloc[i].to_frame().T
+                    break
     else:
         print("No data enough in any of the nearest n stations")
         station = None
@@ -152,8 +156,11 @@ if __name__ == '__main__':
     min_proportion = 0.8
 
     folder_vl = HOME+"data/Curation/AEMET/Values/"
+
     removed_cl = ["sol", "horatmin", "horatmax", "horaracha",
-                  "horaPresMax", "horaPresMin"]
+                  "dir", "velmedia", "horaPresMax", "horaPresMin"]
+    selected_cl = ["fecha", "tmed", "prec",
+                   "tmin", "tmax", "presMax", "presMin"]
 
     # ------------------------------
     #      Curation Process
@@ -162,6 +169,7 @@ if __name__ == '__main__':
     all_station_info = [download_nearest_data(aemet=Aemet, siteAQ=row,
                                               stdy_prd=study_prd,
                                               remove_cl=removed_cl,
+                                              selected_cl=selected_cl,
                                               folder=folder_vl, n=num_stations,
                                               min_prop=min_proportion)
                         for i, row in unique_sites_AQ.iterrows()]
