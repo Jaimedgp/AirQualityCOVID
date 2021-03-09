@@ -89,7 +89,7 @@ get.AQdata <- function(site, pollutant,
 }
 
 
-sv.checkedAQ <- function(fileName="data/Curation/checked_AQ.csv") {
+sv.checkedAQ <- function(start_dt, fileName="data/Curation/checked_AQ.csv") {
     # Download Air quality using checked_AQ information to download
     #      only useful data. Save it in a .rda file
     #
@@ -106,7 +106,7 @@ sv.checkedAQ <- function(fileName="data/Curation/checked_AQ.csv") {
             pll <- levels(as.factor(sites.data[sites.data$site == st,
                                     "Pollutant"]))
             data_AQ <- rbind(data_AQ,
-                              get.AQdata(st, pollutant=pll, start_dt=ymd("2020-01-01"))
+                              get.AQdata(st, pollutant=pll, start_dt=start_dt
                               )
         }
         save(data_AQ, file="data/data_AQ.rda")
