@@ -62,7 +62,7 @@ if(sys.nframe() == 0) {
                        end.year = "current",
                        n = 7, returnMap = F)
 
-        for (cd in levels(as.factor(mto$code))) {
+        for (cd in mto[order(mto$dist), ]$code) {
             fileName <- paste("data/Curation/WorldMet/", cd, ".csv", sep="")
 
             if (file.exists(fileName)) {
