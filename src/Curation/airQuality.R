@@ -23,6 +23,8 @@ suppressMessages(library(openxlsx))
 suppressMessages(library(plyr))
 suppressMessages(library(openair))
 
+setwd("~/Repositories/AirQualityCOVID")
+
 source.file <- "functions.R"
 if (!file.exists(source.file)) {
     source.file <- paste("src/", source.file, sep="")
@@ -270,7 +272,7 @@ if(sys.nframe() == 0) {
     #      Save Curated data
     #------------------------------
 
-    write.csv(valid.info,
+    write.csv(checked_sitesAQ,
               "data/Curation/checked_AQ.csv", row.names=FALSE)
 
     sv.checkedAQ("data/Curation/checked_AQ.csv")

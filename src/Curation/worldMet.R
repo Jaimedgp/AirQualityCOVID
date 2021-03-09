@@ -56,10 +56,11 @@ if(sys.nframe() == 0) {
     sites.Mto <- data.frame()
 
     for (st in sites.lv) {
+        print(st)
         mto <- getMeta(lat = sites.AQ[sites.AQ$site == st, ]$latitude[1],
-                    lon = sites.AQ[sites.AQ$site == st, ]$longitude[1],
-                    end.year = "current",
-                    n = 3, returnMap = F)
+                       lon = sites.AQ[sites.AQ$site == st, ]$longitude[1],
+                       end.year = "current",
+                       n = 7, returnMap = F)
 
         for (cd in levels(as.factor(mto$code))) {
             fileName <- paste("data/Curation/WorldMet/", cd, ".csv", sep="")
@@ -78,7 +79,7 @@ if(sys.nframe() == 0) {
                             select("date", "code", "ws", "wd", "atmos_pres") %>%
                             timeAverage(avg.time = "day", type="code")
 
-                if(sum(colSums(!is.na(data))/ period > min.proportion) == ncol(data)) {
+                if(sum(colSums(!is.na(data.Mto))/ period > min.proportion) == ncol(data.Mto)) {
                     mto[mto$code == cd, "siteAQ"] <- st
                     sites.Mto <- rbind(sites.Mto, mto[mto$code == cd, ])
 
@@ -96,5 +97,5 @@ if(sys.nframe() == 0) {
     #------------------------------
 
     write.csv(sites.Mto,
-              paste("data/Curation/checked_WorldMet.csv"), row.names=FALSE)
+              "data/Curation/checked_WorldMet.csv", row.names=FALSE)
 }

@@ -105,35 +105,38 @@ if(sys.nframe() == 0) {
 
     for (st in levels(nn.stations$siteAQ)) {
 
-        code <- nn.stations[nn.stations$siteAQ == st, "WorldMet"]
+        if (st %in% names(ERA5.Land)) {
+            code <- nn.stations[nn.stations$siteAQ == st, "WorldMet"]
 
-        data.WorldMet <- read.csv(paste(Mto.files, "WorldMet/",
-                                    code, ".csv", sep=""), stringsAsFactor=F) %>%
-                        data.as.datetime("date", "ymd") %>%
-                        select(-"code")
+            data.WorldMet <- read.csv(paste(Mto.files, "WorldMet/",
+                                        code, ".csv", sep=""), stringsAsFactor=F) %>%
+                            data.as.datetime("date", "ymd") %>%
+                            select(-"code")
 
-        indicativo <- nn.stations[nn.stations$siteAQ == st, "AEMET"]
+            indicativo <- nn.stations[nn.stations$siteAQ == st, "AEMET"]
 
-        data.AEMET <- read.csv(paste(Mto.files, "AEMET/",
-                                    indicativo, ".csv", sep=""), stringsAsFactor=F) %>%
-                        data.as.datetime("fecha", "ymd") %>%
-                        select("fecha", "tmed", "prec",
-                            "tmin", "tmax", "presMax", "presMin"
-                            )
+            data.AEMET <- read.csv(paste(Mto.files, "AEMET/",
+                                        indicativo, ".csv", sep=""), stringsAsFactor=F) %>%
+                            data.as.datetime("fecha", "ymd") %>%
+                            select("fecha", "tmed", "prec",
+                                "tmin", "tmax", "presMax", "presMin"
+                                )
 
-        data.row <- merge(x = data.WorldMet, y = data.AEMET,
-                            by.x = "date", by.y = "fecha", all = TRUE)
+            data.row <- merge(x = data.WorldMet, y = data.AEMET,
+                                by.x = "date", by.y = "fecha", all = TRUE)
 
-        for (vr in levels(as.factor(ERA5.Land$variable))) {
-            data.row <- merge(x = data.row,
-                            y = ERA5.Land[ERA5.Land$variable == vr,
-                                            c("dates", st)],
-                            by.x = "date", by.y = "dates", all.x = TRUE
-                            )
-            names(data.row)[ncol(data.row)] <- vr
+            for (vr in levels(as.factor(ERA5.Land$variable))) {
+                data.row <- merge(x = data.row,
+                                y = ERA5.Land[ERA5.Land$variable == vr,
+                                                c("dates", st)],
+                                by.x = "date", by.y = "dates", all.x = TRUE
+                                )
+                names(data.row)[ncol(data.row)] <- vr
+            }
+
+            data.row[, "site"] <- st
+            data_Mto <- rbind(data_Mto, data.row)
         }
-
-        data_Mto <- rbind(data_Mto, data.row)
     }
 
 
