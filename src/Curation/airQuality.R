@@ -275,5 +275,5 @@ if(sys.nframe() == 0) {
     write.csv(checked_sitesAQ,
               "data/Curation/checked_AQ.csv", row.names=FALSE)
 
-    sv.checkedAQ("data/Curation/checked_AQ.csv")
+    sv.checkedAQ(start_dt, "data/Curation/checked_AQ.csv")
 }
