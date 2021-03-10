@@ -140,7 +140,7 @@ if __name__ == '__main__':
     #      Air Quality sites
     # ------------------------------
 
-    sites_AQ = pd.read_csv(HOME+"data/Curation/AirQuality/checked_sitesAQ.csv")
+    sites_AQ = pd.read_csv(HOME+"data/Curation/AirQuality/checked_AQ.csv")
 
     unique_sites_AQ = sites_AQ.groupby(["site",
                                         "latitude",
