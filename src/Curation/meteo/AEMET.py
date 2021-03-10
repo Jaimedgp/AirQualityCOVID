@@ -123,7 +123,7 @@ class DownloadAEMET():
             else:
                 return None
 
-        data_pd = pd.DataFrame.from_dict(data) .replace({"Ip": 0.05,
+        data_pd = pd.DataFrame.from_dict(data) .replace({"Ip": "0,05",
                                                          "Varias": -2})
 
         return DownloadAEMET.dot_decimals(data_pd)
