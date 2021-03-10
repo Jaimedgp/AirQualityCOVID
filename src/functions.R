@@ -106,7 +106,7 @@ sv.checkedAQ <- function(start_dt, fileName="data/Curation/checked_AQ.csv") {
             pll <- levels(as.factor(sites.data[sites.data$site == st,
                                     "Pollutant"]))
             data_AQ <- rbind(data_AQ,
-                              get.AQdata(st, pollutant=pll, start_dt=start_dt
+                              get.AQdata(st, pollutant=pll, start_dt=start_dt)
                               )
         }
         save(data_AQ, file="data/data_AQ.rda")
