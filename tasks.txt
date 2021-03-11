@@ -1,0 +1,45 @@
+SE VA A HACER UN MODELO POR CADA CONTAMINANTE Y ESTACION. PARECE QUE HAY MUCHA 
+    DIFERENCIA DE UNA ESTACION A OTRA (matriz de correlacion)
+
+Modelos no lineales
+    |
+    |--------> (Benchmark) REGRESION LINEAL
+    |               :
+    |               :~~~> stepwise: seleccionar predictores buenos 
+    |               :~~~> Validacion: Bias, 
+    |               :                 ratio de varianza, 
+    |               :                 Correlacion
+    |               :                      !
+    |               :                      +====> deseason
+    |               :~~~> Glm: para los NOx ya que no son gaussianos sino gamma
+    |
+    |--------> RANDOMFOREST
+    |               :
+    |               :~~~> ntree < 100 (~50)
+    |               :~~~> numPred => no muy relevante
+    |
+    |--------> ANALOGOS
+                    :
+                    :~~~> No esta muy claro que vayamos a sacar nada por que 
+                    :       analogos le da los mismos pesos a todos los 
+                    :       predictores, por lo que si tienes buenos predictores
+                    :       bien, pero al introducir malos predictores el modelo
+                    :       empeora
+
+Cross-Validation
+    |
+    |--------> Hacer cross-validacion de k-fold pero con anhos naturales. De esa
+                forma entrenamos el modelo con cinco anhos y validamos con 1. 
+                De esta forma quitamos las posibles tendencias
+
+AutoCorrelacion
+    |--------> Dependencia de los datos con los valores de los dias anteriores.
+                La contaminacion si puede depender de los valores previos en un 
+                rango de dias, pero posiblemente mas debido al estancamiento del 
+                aire.
+
+P.D.
+    |
+    |--------> Redes Bayesianas
+    |
+    |--------> Test de sapiro
