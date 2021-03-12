@@ -21,10 +21,10 @@ Modelos no lineales
     |--------> ANALOGOS
                     :
                     :~~~> No esta muy claro que vayamos a sacar nada por que 
-                    :       analogos le da los mismos pesos a todos los 
-                    :       predictores, por lo que si tienes buenos predictores
-                    :       bien, pero al introducir malos predictores el modelo
-                    :       empeora
+                            analogos le da los mismos pesos a todos los 
+                            predictores, por lo que si tienes buenos predictores
+                            bien, pero al introducir malos predictores el modelo
+                            empeora
 
 Cross-Validation
     |
