@@ -8,7 +8,7 @@ suppressMessages(library(BBmisc))
 
 # Paralelizar
 suppressMessages(library(doMC))
-registerDoMC(cores=as.integer(detectCores()*0.75))
+registerDoMC(cores=14)
 
 
 open.data <- function(sites) {
@@ -74,7 +74,7 @@ leave.one.year.out <- function(yr, dat, omit.cl) {
 
     cv.k <- data.frame()
 
-    for (ntree in c(50, 70, 100, 150, 200, 250, 300)) {
+    for (ntree in c(10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 150, 200, 250, 300)) {
         model <- train(value ~.,
                        data=dat[, -omit.cl], subset=train,
                        method="rf", ntree=ntree,
@@ -128,7 +128,7 @@ no.num.cl <- 1:3 # no numeric columns
 cv.df <- data.frame()
 
 t_init <- Sys.time()
-i <- 0
+i <- 1
 # Create one model for each pair of station-pollutant
 for (st in sites.lv) {
     print(paste(i, "/", length(sites.lv)))
