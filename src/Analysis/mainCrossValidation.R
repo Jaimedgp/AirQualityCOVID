@@ -50,11 +50,13 @@ cross.validation <- function(dat, target, k.fold) {
     date.test <- dat %>% select(date) %>% slice(k.fold$test)
 
     cross.param <- list()
-    for (k in c(10, 20, 30, 50, 100, 150, 200)) {
+    #for (k in c(10, 20, 30, 50, 100, 150, 200)) {
+    for (k in 0:0) {
+        cat("\r", k)
         model <- train(y = y.train,
                        x = x.train,
-                       method="rf",
-                       ntree=k,
+                       method="lm",
+                       #ntree=k,
                        #tuneGrid=data.frame(k=k),
                        allowParallel = TRUE
                   )
@@ -74,7 +76,7 @@ cross.validation <- function(dat, target, k.fold) {
 
 if(sys.nframe() == 0) {
 
-    method <- "knn"
+    method <- "lm"
 
     sites.lv <- c("es0118a", "es1438a") # Big cities (Madrid and Barcelona)",
     sites.lv <- c(sites.lv, "es1580a", "es1340a") # small cities (Santander and Huelva)
@@ -89,13 +91,15 @@ if(sys.nframe() == 0) {
     init <- Sys.time()
 
     # Create one model for each pair of station-pollutant
-    for (st in sites.lv[1]) {
+    for (st in sites.lv) {
         print(st)
         names.st <- names(all.df[[st]])
         pollutants <- names.st[which(names.st %in% c("no", "no2", "pm10",
                                                       "pm2.5", "o3"))]
         for (pll in pollutants) {
+            print(paste("", pll, sep="    "))
             for (dy in days) {
+                print(paste("", "", dy, sep="    "))
                 data.st <- all.df[[st]] %>%
                             select(-all_of(
                                 pollutants[-which(pollutants == pll)])) %>%
@@ -122,7 +126,6 @@ if(sys.nframe() == 0) {
                                             name=names(yr.fold)
                                      ))
                     cross.val <- do.call(rbind.cv, list(cross.val, cross.row))
-                #}
             }
         }
     }
