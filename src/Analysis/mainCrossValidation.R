@@ -49,40 +49,47 @@ cross.validation <- function(dat, target, k.fold) {
 
     date.test <- dat %>% select(date) %>% slice(k.fold$test)
 
-    cross.param <- list()
-    #for (k in c(10, 20, 30, 50, 100, 150, 200)) {
-    for (k in 0:0) {
-        cat("\r", k)
-        model <- train(y = y.train,
-                       x = x.train,
-                       method="lm",
-                       #ntree=k,
-                       #tuneGrid=data.frame(k=k),
-                       allowParallel = TRUE
-                  )
+    #params <- 0
+    #params <- 1:10
+    params <- c(10, 20, 30, 50, 100, 150, 200)
 
-        cross.param <- do.call(rbind.cv, list(cross.param,
-                                              cbind.cv(calc.metrics(model,
-                                                                    x.test,
-                                                                    y.test,
-                                                                    date.test),
-                                                       list(param=as.factor(k)))
-                                             ))
-    }
-    cross.param
+    cross.param <- do.call(rbind.cv,
+                           lapply(params,
+                                  function(param) {
+                                      model <- train(y = y.train,
+                                          x = x.train,
+                                          method="rf",
+                                          ntree=param,
+                                          #tuneGrid=data.frame(k=param),
+                                          allowParallel = TRUE
+                                          )
+
+                                      cbind.cv(calc.metrics(model,
+                                                            x.test,
+                                                            y.test,
+                                                            date.test),
+                                               list(param=as.factor(param)))
+                                  }))
 }
 
 
 
 if(sys.nframe() == 0) {
 
-    method <- "lm"
+    method <- "rf"
 
-    sites.lv <- c("es0118a", "es1438a") # Big cities (Madrid and Barcelona)",
-    sites.lv <- c(sites.lv, "es1580a", "es1340a") # small cities (Santander and Huelva)
+    sites.lv <- c("es0118a", "es1438a",  # Madrid, Barcelona
+                  "es1625a", "es0890a",  # Valencia, Sevilla
+                  "es1047a", "es1137a",  # Zaragoza, Vigo
+                  "es1632a", "es0110a",  # Valladolid, Bilbao
+                  "es1580a", "es1340a"   # Santander, Huelva
+                  )
 
     all.df <- open.data(sites = sites.lv,
-                        end_dt = lubridate::ymd("2020-01-01"))
+                        end_dt = lubridate::ymd("2020-01-01"),
+                        airQuality.fl = "data/full_data/data_AQ.rda",
+                        meteo.fl = "data/full_data/meteorology.rda"
+                        )
 
     days <- 0:3
     n.iqr <- 10
@@ -91,15 +98,14 @@ if(sys.nframe() == 0) {
     init <- Sys.time()
 
     # Create one model for each pair of station-pollutant
-    for (st in sites.lv) {
+    for (st in sites.lv[1]) {
         print(st)
         names.st <- names(all.df[[st]])
-        pollutants <- names.st[which(names.st %in% c("no", "no2", "pm10",
-                                                      "pm2.5", "o3"))]
+        pollutants <- names.st[which(names.st %in% c("no", "no2"))]  #, "pm10",
+                                                      # "pm2.5", "o3"))]
         for (pll in pollutants) {
             print(paste("", pll, sep="    "))
             for (dy in days) {
-                print(paste("", "", dy, sep="    "))
                 data.st <- all.df[[st]] %>%
                             select(-all_of(
                                 pollutants[-which(pollutants == pll)])) %>%
