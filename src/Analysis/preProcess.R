@@ -96,13 +96,13 @@ un.range.1D <- function(cl, attri=NULL) {
 # @author Jaimedgp
 filter.IQR.1D <- function(cl, n, qntl=0.75) {
 
-    min.IQ <- quantile(cl, 1-qntl, na.rm=TRUE)
+    min.IQ <- quantile(cl, (1-qntl), na.rm=TRUE)
     max.IQ <- quantile(cl, qntl, na.rm=TRUE)
 
     IQ.range <- max.IQ - min.IQ
 
-    cl[which(cl < (min.IQ - (n*IQ.range)) &
-             cl > (max.IQ + (n*IQ.range)))] <- NaN
+    cl[which(cl < (min.IQ - (n*IQ.range)))] <- NA
+    cl[which(cl > (max.IQ + (n*IQ.range)))] <- NA
 
     cl
 }
@@ -111,15 +111,83 @@ filter.IQR.1D <- function(cl, n, qntl=0.75) {
 # Apply filter.IQR.1D to the given columns of a dataframe
 #
 # @params:
-#     - cl: numeric vector with data
+#     - dat.df: data.frame with data to transform
+#     - columns: columns to apply filter.IQR.1D
 #     - n: number of times of iqr for outlayers
 #     - qntl: upper quantile for iqr. Default 0.75 which corresponds to Q3
 # @return:
-#     numeric vector with the same length of the original in which all
-#         valuers outside interval (n*(q3-q1)) is convert to NaN. This is done
-#         for the cases where cl is a column of a dataframe, so the row can be
-#         removed for all dataframe outside the function.
+#     data.frame with the same length of the original in which all
+#         values (of the selected columns or all numeric columns) outside
+#         interval (n*(q3-q1)) is convert to NaN. This is done for the cases
+#         where cl is a column of a dataframe, so the row can be removed for
+#         all dataframe outside the function.
 #
 # @author Jaimedgp
-#filter.IQR <- function(cl, n, qntl=0.75) {
-#}
+filter.IQR <- function(dat.df, columns=NULL, n=3, qntl=0.75) {
+
+    if (is.null(columns)) {
+        fixed <- dat.df %>% select(-where(is.numeric))
+        to.change <- dat.df %>% select(where(is.numeric))
+    } else {
+        fixed <- dat.df %>% select(-all_of(columns))
+        to.change <- dat.df %>% select(all_of(columns))
+    }
+
+    cbind(fixed, data.frame(apply(to.change, 2, filter.IQR.1D, n, qntl)))
+}
+
+
+# Transform data by scaling to given interval.
+#
+# @params:
+#     - dat.df: data.frame with data to transform
+#     - columns: columns to apply filter.IQR.1D
+#     - interval: vector with the interval to transform data.
+# @return:
+#     data.frame with the data scaled to the given interval. The max and
+#         min value of the origin data are passed as attributes of each
+#         transformed columns for un-do.
+#
+# @author Jaimedgp
+
+range.df <- function(dat.df, columns=NULL, interval=c(0, 1)) {
+
+    if (is.null(columns)) {
+        fixed <- dat.df %>% select(-where(is.numeric))
+        columns <- dat.df %>% select(where(is.numeric)) %>% names()
+    } else {
+        fixed <- dat.df %>% select(-all_of(columns))
+    }
+
+    new.dat <- data.frame(lapply(columns, function(nm){
+        range.1D(dat.df[, nm])
+    } ))
+
+    names(new.dat) <- columns
+
+    cbind(fixed, new.dat)
+}
+
+
+# Un-do data transformation by re-scaling to the original interval.
+#
+# @params:
+#     - dat.df: data.frame with data to transform
+#     - columns: columns to apply filter.IQR.1D
+#     - attri: if cl has not original interval as attribute, pass as param.
+# @return:
+#     data.frame with the data scaled to the original interval.
+#
+# @author Jaimedgp
+un.range.df <- function(dat.df, columns=NULL, attri=NULL) {
+
+    if (is.null(columns)) {
+        fixed <- dat.df %>% select(-where(is.numeric))
+        to.change <- dat.df %>% select(where(is.numeric))
+    } else {
+        fixed <- dat.df %>% select(-all_of(columns))
+        to.change <- dat.df %>% select(all_of(columns))
+    }
+
+    cbind(fixed, apply(to.change, 2, un.range.1D, attri))
+}

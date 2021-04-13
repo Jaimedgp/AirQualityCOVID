@@ -12,6 +12,7 @@
 #     pass
 #
 # @author Jaimedgp
+
 open.data <- function(sites,
                       variables=c("no", "no2", "o3", "pm10", "pm2.5"),
                       start_dt=lubridate::ymd("1800-01-01"),
@@ -63,4 +64,44 @@ open.data <- function(sites,
 }
 
 
+#
+#
+# @params:
+#     - :
+# @return:
+#     A
+#
+# @author Jaimedgp
 
+add.yesterday.meteo <- function(dat.df, n.days=1) {
+
+    if (n.days < 1) {
+        return(dat.df)
+    }
+
+    if (!("date" %in% names(dat.df))) {
+        print("Must have a date column")
+        return()
+    }
+
+    meteo.cl <- c("ws", "wd", "tmed", "prec", "tmin", "tmax",
+                  "presMax", "presMin", "RH", "solar.radiation")
+    col.add <- names(dat.df)[which(names(dat.df) %in% meteo.cl)]
+
+    yesterday.df <- dat.df
+
+    for (i in 1:n.days) {
+        new.df <- dat.df %>%
+                mutate(date=date-i) %>%
+                select(date, all_of(c("ws", "wd", "tmed", "prec", "tmin", "tmax",
+                                    "presMax", "presMin", "RH", "solar.radiation")))
+
+        yesterday.df <- merge(yesterday.df, new.df,
+                              by = "date",
+                              all.x=T,
+                              suffixes = c("", paste("", i, "before", sep="."))
+                              ) %>% slice(-1)
+    }
+
+    return(yesterday.df)
+}

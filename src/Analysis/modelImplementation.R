@@ -10,21 +10,24 @@
 #
 # @author Jaimedgp
 
-model.predict <- function(model, obs, n.quantile=99, extrapolation="qwerty") {
+qq.predict <- function(model, x.obs, y.obs, date, n.quantile=99, extrapolation="qwerty") {
 
     if ("lm" %in% class(model)) {
         train.outcome <- model$model[,1]
+
     } else if ("train" %in% class(model)) {
         train.outcome <- model$trainingData$.outcome
+
     } else if ("randomForest" %in% class(model)) {
         train.outcome <- model$y
+
     } else {
         print(paste("Please pass as model a class of type",
                     "'randomForest', 'lm' or a caret 'train' class"))
         return()
     }
 
-    pred <- predict(model, newdata=obs)
+    pred <- predict(model, newdata=x.obs)
 
     pred.qq <- downscaleR:::eqm(train.outcome,
                                 predict(model),
@@ -34,7 +37,7 @@ model.predict <- function(model, obs, n.quantile=99, extrapolation="qwerty") {
                                 extrapolation=extrapolation
                                )
 
-    data.frame(pred, pred.qq)
+    data.frame(date=date, obs=y.obs, pred, pred.qq)
 }
 
 
@@ -66,13 +69,15 @@ comp.metrics <- function(obs, obs.ds=NA,
                           )
 
     if (sum(!is.na(pred.qq)) != 0) {
-        metrics <- cbind(metrics,
+        metrics <- rbind(cbind(data.frame(qq.Mapping="No"),
+                               metrics),
                          data.frame(
-                            "bias.qq"=mean(pred.qq.ds) / mean(obs.ds),
-                            "var.ratio.qq"=var(pred.qq.ds) / var(obs.ds),
-                            "cor1.qq"=cor(pred.qq.ds, obs.ds),
-                            "cor2.qq"=cor(pred.qq.ds, obs.ds),
-                            "RMSE.qq"=sqrt(mean((pred.qq.ds - obs.ds)^2))
+                            qq.Mapping="Yes",
+                            "bias"=mean(pred.qq.ds) / mean(obs.ds),
+                            "var.ratio"=var(pred.qq.ds) / var(obs.ds),
+                            "cor1"=cor(pred.qq.ds, obs.ds),
+                            "cor2"=cor(pred.qq.ds, obs.ds),
+                            "RMSE"=sqrt(mean((pred.qq.ds - obs.ds)^2))
                             )
                          )
     }
@@ -139,8 +144,8 @@ leave.one.year.out <- function(date) {
 
     yr.fold <- list()
     for (yr in levels(years)) {
-        yr.fold[[yr]]$train <- which(lubridate::year(date) != yr)
-        yr.fold[[yr]]$test <- which(lubridate::year(date) == yr)
+        yr.fold[[yr]]$train <- which(lubridate::year(date) != as.numeric(yr))
+        yr.fold[[yr]]$test <- which(lubridate::year(date) == as.numeric(yr))
     }
     yr.fold
 }
