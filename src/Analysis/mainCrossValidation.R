@@ -76,7 +76,7 @@ cross.validation <- function(dat, target, k.fold) {
 
 if(sys.nframe() == 0) {
 
-    method <- "rf"
+    method <- "rf-full"
 
     sites.lv <- c("es0118a", "es1438a",  # Madrid, Barcelona
                   "es1625a", "es0890a",  # Valencia, Sevilla
@@ -101,8 +101,8 @@ if(sys.nframe() == 0) {
     for (st in sites.lv[1]) {
         print(st)
         names.st <- names(all.df[[st]])
-        pollutants <- names.st[which(names.st %in% c("no", "no2"))]  #, "pm10",
-                                                      # "pm2.5", "o3"))]
+        pollutants <- names.st[which(names.st %in% c("no", "no2", "pm10",
+                                                     "pm2.5", "o3"))]
         for (pll in pollutants) {
             print(paste("", pll, sep="    "))
             for (dy in days) {
