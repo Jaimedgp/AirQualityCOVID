@@ -31,9 +31,9 @@ open.data <- function(sites,
     for (nm in sites) {
         aq <- data_AQ %>%
                     filter(site == nm,
-                        variable %in% variables,
-                        date > start_dt,
-                        date < end_dt) %>%
+                           variable %in% variables,
+                           date > start_dt,
+                           date < end_dt) %>%
                     pivot_wider(names_from = variable,
                                 values_from = value) %>%
                     openair::timeAverage(avg.time = "day",
