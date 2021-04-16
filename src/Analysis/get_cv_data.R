@@ -9,7 +9,7 @@ source("src/Analysis/modelImplementation.R")
 
 method <- "lm"
 
-load(paste("data/Cross-validation/cross_val/", method, ".rda", sep=""))
+load(paste("data/Cross-validation/", method, ".rda", sep=""))
 
 
 final.sites <- list("es0118a" = c("no", "no2", "o3", "pm10", "pm2.5"),
@@ -25,20 +25,20 @@ final.sites <- list("es0118a" = c("no", "no2", "o3", "pm10", "pm2.5"),
 
 final.cv <- list()
 for (st in names(final.sites)) {
-    final <- list(cross.val$metrics %>%
+    final <- list(metrics = cross.val$metrics %>%
                         filter(site == st,
                                variable %in% final.sites[[st]]),
-                  cross.val$predictions %>%
+                  predictions = cross.val$predictions %>%
                         filter(site == st,
                                variable %in% final.sites[[st]]),
-                  cross.val$predictions.ds %>%
+                  predictions.ds = cross.val$predictions.ds %>%
                         filter(site == st,
                                variable %in% final.sites[[st]])
                   )
 
-    final.cv <- do.call(rbind.cv, list(final.cv, final))
+    final.cv <- do.call(rbind.cv, list(final, final.cv))
 }
 
 save(final.cv,
-     file = paste("data/Cross-validation/cross_val/",
+     file = paste("data/Cross-validation/",
                     method, "-final.rda", sep=""))
