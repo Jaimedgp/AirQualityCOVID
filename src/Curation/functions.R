@@ -4,25 +4,26 @@
 # General functions used to load and transform data for curation.
 #     - data.as.datetime: Convert date column into datetime format
 #     - get.AQdata: Load air quality data
-#     - group.by.date: Change Date resolution
 #
 # @author Jaimedgp
 ########################################################################
 
 # load packages
-suppressMessages(library(saqgetr))
-suppressMessages(library(lubridate))
+suppressMessages(require(saqgetr))
+suppressMessages(require(lubridate))
 
 
+#'                  data.as.datetime
+#'
+#' Converte date column into datetime format using lubridate package
+#'
+#' @params:
+#'     dataframe: dataframe with all data
+#'     column: name or names of date column
+#'     FUN: lubridate function to apply. Can be date ('ymd') or datetime ('ymd <- hms')
+#' @return:
+#'     dataframe: same dataframe with date column as datetime format
 data.as.datetime <- function(dataframe, column, FUN){
-    # Converte date column into datetime format using lubridate package
-    #
-    # @params:
-    #     dataframe: dataframe with all data
-    #     column: name or names of date column
-    #     FUN: lubridate function to apply. Can be date ('ymd') or datetime ('ymd <- hms')
-    # @return:
-    #     dataframe: same dataframe with date column as datetime format
 
     if (FUN == "ymd_hms") {
         dataframe[, column] <- ymd_hms(dataframe[, column])
@@ -35,26 +36,28 @@ data.as.datetime <- function(dataframe, column, FUN){
 }
 
 
+#'                  get.AQdata
+#'
+#' Obtain annual air quiality data. Data can be obtained either from
+#'     file with previous downloaded data or from saqgetr function
+#'
+#' @param:
+#'     site: site code for air quality station. e.g.: "es0000a"
+#'     pollutant: pollutants from which to download
+#'                concentrations. e.g.: c("no2", "o3")
+#'     start_dt: Start date for returned observations. if start_dt
+#'               is a date, its year is taken as start date.
+#'     end_dt: End date for returned observations. if end_dt
+#'             is a date, its year is taken as end date.
+#'     data.by.file: Boolean with the condition if the data
+#'                   is taken from the file.
+#'     fileName: Path of the downloaded data files from where the
+#'               data is loaded if data.by.file is true
+#' @return:
+#'     data.AQ: dataframe with air quality data
 get.AQdata <- function(site, pollutant,
                        start_dt, end_dt=NA, data.by.file=FALSE,
                        fileName="data/Curation/AirQuality/Values/") {
-    # Obtain annual air quiality data. Data can be obtained either from
-    #     file with previous downloaded data or from saqgetr function
-    #
-    # @params:
-    #     site: site code for air quality station. e.g.: "es0000a"
-    #     pollutant: pollutants from which to download
-    #                concentrations. e.g.: c("no2", "o3")
-    #     start_dt: Start date for returned observations. if start_dt
-    #               is a date, its year is taken as start date.
-    #     end_dt: End date for returned observations. if end_dt
-    #             is a date, its year is taken as end date.
-    #     data.by.file: Boolean with the condition if the data
-    #                   is taken from the file.
-    #     fileName: Path of the downloaded data files from where the
-    #               data is loaded if data.by.file is true
-    # @return:
-    #     data.AQ: dataframe with air quality data
 
     fileName <- paste(fileName, site, ".csv", sep="")
 
@@ -90,24 +93,32 @@ get.AQdata <- function(site, pollutant,
 }
 
 
-group.by.date <- function(formulation, dataFrame, dateCl, unit="day", FUN="mean") {
-    # Summarize data by date, changing the temporal resolution of the dataframe
-    #
-    # @params:
-    #     valueList: List with the columns to summarize.
-    #                e.g.: list(columnName=columnValues)
-    #     byList: List with date columns to change date resolution
-    #                e.g.: list(dateColumnName=dateColumnValues)
-    #     dataFrame: Dataframe with all data
-    #     unit: Target temporal resolution
-    #     FUN: Function by which aggrgation is done
-    # @return:
-    #     dataframe with temporal resolution changed
+#'                  sv.checkedAQ
+#'
+#' Download Air quality using checked_AQ information to download
+#'      only useful data. Save it in a .rda file
+#'
+#' @params:
+#'     fileName: Path to checked_AQ file
+#' @return:
+#'     data_AQ: dataframe with all air quality data
+sv.checkedAQ <- function(start_dt, fileName="data/Curation/checked_AQ.csv") {
 
-    dataFrame[, dateCl] <- floor_date(dataFrame[, dateCl], unit=unit) # Change date resolution
+    if (file.exists(fileName)) {
+        sites.data <- read.csv(fileName, stringsAsFactor=F)
+        data_AQ <- data.frame()
 
-    aggregate(formulation, data=dataFrame, FUN=FUN, rm.na=TRUE)
-              #valueList,
-              #by=byList,
-              #FUN=FUN, rm.na=TRUE)
+        for (st in levels(as.factor(sites.data$site))) {
+            pll <- levels(as.factor(sites.data[sites.data$site == st,
+                                    "Pollutant"]))
+            data_AQ <- rbind(data_AQ,
+                              get.AQdata(st, pollutant=pll, start_dt=start_dt)
+                              )
+        }
+        save(data_AQ, file="data/data_AQ.rda")
+    } else {
+        data_AQ <- NULL
+    }
+
+    data_AQ
 }

@@ -8,7 +8,7 @@
 #
 # functions:
 #     - get.sites: Get information of the relevant stations.
-#     - have.min: Check if the station has enough data fro main study period
+#     - have.min: Check if the station has enough data for main study period
 #     - get.missing: Get number of missing units of time in data
 #     - main.curation: Main function for curation process
 #
@@ -16,11 +16,12 @@
 ##############################################################################
 
 # load packages
-suppressMessages(library(saqgetr))
-suppressMessages(library(lubridate))
-suppressMessages(library(tidyverse))
-suppressMessages(library(openxlsx))
-suppressMessages(library(plyr))
+suppressMessages(require(saqgetr))
+suppressMessages(require(lubridate))
+suppressMessages(require(tidyverse))
+suppressMessages(require(openxlsx))
+suppressMessages(require(plyr))
+suppressMessages(require(openair))
 
 source.file <- "functions.R"
 if (!file.exists(source.file)) {
@@ -41,19 +42,21 @@ conversion <- list("hour" = 3600,
                    )
 
 
+#'                       get.sites
+#'
+#' Get information of the relevant station.
+#'
+#' @param:
+#'     type: Type of air quality station. e.g.: "traffic", "background"
+#'     area: Aerea of air quality station. e.g.: "urban", "rural"
+#'     start_dt: Minimum date of beginning of data collection of the station
+#'     file.es: File with the codes of the stations if the cities
+#'     sheets: Important sheet of file.es
+#' @return:
+#'     dataframe with merge information from file.es and saqgetr
 get.sites <- function(type, area, start_dt,
                       file.es="data/xlsx/estaciones-CA-JA.xlsx",
                       sheets="ciudades-100000-A") {
-    # Get information of the relevant station.
-    #
-    # @params:
-    #     type: Type of air quality station. e.g.: "traffic", "background"
-    #     area: Aerea of air quality station. e.g.: "urban", "rural"
-    #     start_dt: Minimum date of beginning of data collection of the station
-    #     file.es: File with the codes of the stations if the cities
-    #     sheets: Important sheet of file.es
-    # @return:
-    #     dataframe with merge information from file.es and saqgetr
 
 
     # xlsx file with information of the spanish cities with > 100000 inhabitants
@@ -79,26 +82,32 @@ get.sites <- function(type, area, start_dt,
 }
 
 
-have.min <- function(dataFrame, study.prd, minPercentage=0.8, unit="hour") {
-    # Check if the station has enough data for main study period
-    #
-    # @params:
-    #     dataframe: Dataframe with air quality data
-    #     study.prd: vector with start and end date of main study period.
-    #                e.g.: c(start_dt, end_dt)
-    #     minPercentage: minimum amount of data to consider enough data in
-    #                    main study period.
-    #                           valid_values
-    #                       ------------------  > minPercentage
-    #                           Total_values
-    #     unit: temporal resolution used
-    # @return:
-    #     Boolean if dataframe has enough data in main study period
+#'                       have.min
+#'
+#' Check if the station has enough data for main study period
+#'
+#' @param:
+#'     dataframe: Dataframe with air quality data
+#'     study.prd: vector with start and end date of main study period.
+#'                e.g.: c(start_dt, end_dt)
+#'     minPercentage: minimum amount of data to consider enough data in
+#'                    main study period.
+#'                           valid_values
+#'                       ------------------  > minPercentage
+#'                           Total_values
+#'     unit: temporal resolution used
+#' @return:
+#'     Boolean if dataframe has enough data in main study period
+have.min <- function(dataFrame, study.prd, minPercentage=0.8, unit="day") {
 
-    new.df <- dataFrame[dataFrame$date >= study.prd[1] &
-                        dataFrame$date <= study.prd[2], ] %>%
-                    group.by.date(formulation=value ~ date,
-                                  dateCl="date", unit=unit, FUN=mean)
+    new.df <- dataFrame %>%
+                    filter(date >= study.prd[1],
+                           date <= study.prd[2])
+    if (nrow(new.df) == 0) {
+        return(FALSE)
+    }
+
+    new.df <- timeAverage(new.df, avg.time = unit, type = c("site", "variable"))
 
     # num of hours in main study period
     period <- as.integer(interval(round_date(study.prd[1], unit=unit),
@@ -112,21 +121,21 @@ have.min <- function(dataFrame, study.prd, minPercentage=0.8, unit="hour") {
 }
 
 
+#'                       get.missing
+#'
+#' Get number of missing units of time in data between study time.
+#'
+#' @param:
+#'     dataframe: Dataframe with air quality data
+#'     unit: unit of time
+#'     start_dt: start date of study
+#'     end_dt: end date of study
+#' @return:
+#'     Numer of units missing in study time
 get.missing <- function(dataFrame, unit="week",
                         start_dt=ymd("2013-01-01"), end_dt=ymd("2020-12-31")) {
-    # Get number of missing units of time in data between study time.
-    #
-    # @params:
-    #     dataframe: Dataframe with air quality data
-    #     unit: unit of time
-    #     start_dt: start date of study
-    #     end_dt: end date of study
-    # @return:
-    #     Numer of units missing in study time
 
-    new.df <- group.by.date(formulation=value ~ date,
-                            dataFrame=dataFrame, dateCl = "date",
-                            unit=unit, FUN=mean)
+    new.df <- timeAverage(dataFrame, avg.time = unit, type = c("site", "variable"))
     period <- (interval(round_date(start_dt, unit=unit),
                         round_date(end_dt, unit=unit)
                        )
@@ -137,30 +146,32 @@ get.missing <- function(dataFrame, unit="week",
 }
 
 
+#'                       main.curation
+#'
+#' Main curation function to execute have.min and get.missing to obtain
+#'     the relevant information about the amount of valid data each site has.
+#'
+#' @param:
+#'     pair.st.pll: Vector with pair site code and pollutant
+#'                  e.g.: c("es0000a", "no2")
+#'     study.prd: Vector with start and end dates of study.
+#'                e.g.: c(start_dt, end_dt)
+#'     main.prd: Vector with start and end dates of main study period. This
+#'               is the period used in have.min(). e.g.: c(start_dt, end_dt)
+#'     minPercentage: Parameter use in have.min
+#' @return:
+#'     dataframe with the relevant information in each column
+#'         - site: air quality station code
+#'         - Pollutant: pollutant code
+#'         - start_yr: date of beginning of data collection of the pollutant
+#'                     for each station
+#'         - end_yr: date of ending of data collection of the pollutant
+#'                   for each station
+#'         - hv.min: Boolean if has enough data in main study period
+#'         - mss.wk: number of missing weeks
+#'         - mss.mnth: number of missing months
+#'         - mss.yr: number of missing years
 main.curation <- function(pair.st.pll, study.prd, main.prd, minPercentage){
-    # Main curation function to execute have.min and get.missing to obtain
-    #     the relevant information about the amount of valid data each site has.
-    #
-    # @params:
-    #     pair.st.pll: Vector with pair site code and pollutant
-    #                  e.g.: c("es0000a", "no2")
-    #     study.prd: Vector with start and end dates of study.
-    #                e.g.: c(start_dt, end_dt)
-    #     main.prd: Vector with start and end dates of main study period. This
-    #               is the period used in have.min(). e.g.: c(start_dt, end_dt)
-    #     minPercentage: Parameter use in have.min
-    # @return:
-    #     dataframe with the relevant information in each column
-    #         - site: air quality station code
-    #         - Pollutant: pollutant code
-    #         - start_yr: date of beginning of data collection of the pollutant
-    #                     for each station
-    #         - end_yr: date of ending of data collection of the pollutant
-    #                   for each station
-    #         - hv.min: Boolean if has enough data in main study period
-    #         - mss.wk: number of missing weeks
-    #         - mss.mnth: number of missing months
-    #         - mss.yr: number of missing years
 
     site <- pair.st.pll[1]
     pll <- pair.st.pll[2]
