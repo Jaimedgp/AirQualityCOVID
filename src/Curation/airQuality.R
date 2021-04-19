@@ -100,28 +100,27 @@ get.sites <- function(type, area, start_dt,
 #'     unit: temporal resolution used
 #' @return:
 #'     Boolean if dataframe has enough data in main study period
-have.min <- function(dataFrame, study.prd, minPercentage=0.8, unit="hour") {
+have.min <- function(dataFrame, study.prd, minPercentage=0.8, unit="day") {
 
-    new.df <- dataFrame[dataFrame$date >= study.prd[1] &
-                        dataFrame$date <= study.prd[2], ]
-    if (nrow(new.df) > 0) {
-        new.df <- timeAverage(new.df, avg.time = unit, type=c("variable", "site"))
+    new.df <- dataFrame %>%
+                filter(date >= study.prd[1],
+                       date <= study.prd[2])
 
-        # num of hours in main study period
-        period <- as.integer(interval(round_date(study.prd[1], unit=unit),
-                                    round_date(study.prd[2], unit=unit)
-                                    )
-                            / conversion[[unit]])
-
-        amount.data <- (sum(!is.na(new.df$value)) / period)
-
-        boolean <- amount.data >= minPercentage
-    } else {
-        boolean <- FALSE
+    if (nrow(new.df) == 0) {
+        return(FALSE)
     }
 
-    boolean
+    new.df <- timeAverage(new.df, avg.time = unit, type=c("variable", "site"))
 
+    # num of hours in main study period
+    period <- as.integer(interval(round_date(study.prd[1], unit=unit),
+                                round_date(study.prd[2], unit=unit)
+                                )
+                        / conversion[[unit]])
+
+    amount.data <- (sum(!is.na(new.df$value)) / period)
+
+    amount.data >= minPercentage
 }
 
 
@@ -239,7 +238,7 @@ if(sys.nframe() == 0) {
 
     hv.min.percent <- 0.8 # data > 80%
     main.prd <- c(ymd_hms("2020-03-01 00:00:00"),
-                  ymd_hms("2020-05-01 00:00:00"))
+                  ymd_hms("2020-06-30 00:00:00"))
 
     sites.lv <- levels(as.factor(sites.AQ$site))
     pairs.st.pll <- do.call(rbind,
@@ -268,8 +267,9 @@ if(sys.nframe() == 0) {
     #        |   miss.yr | $< 5$ |
     #-----------------------------------------
 
-    valid.info <- curate.info[curate.info$hv.min == TRUE,]
-    valid.info <- valid.info[valid.info$mss.yr < 5,]
+    valid.info <- curate.info %>%
+                    filter(hv.min == TRUE,
+                           mss.yr < 5)
 
     checked_sitesAQ <- merge(x = valid.info %>%
                                   select(site, Pollutant),
@@ -283,5 +283,5 @@ if(sys.nframe() == 0) {
     write.csv(checked_sitesAQ,
               "data/Curation/checked_AQ.csv", row.names=FALSE)
 
-    sv.checkedAQ(start_dt, "data/Curation/checked_AQ.csv")
+    sv.data <- sv.checkedAQ(start_dt, "data/Curation/checked_AQ.csv")
 }
