@@ -50,13 +50,14 @@ cross.validation <- function(dat, target, k.fold) {
     date.test <- dat %>% select(date) %>% slice(k.fold$test)
 
     #params <- 0
-    #params <- 1:10
-    params <- c(10, 20, 30, 50, 100, 150, 200)
+    params <- 1:10
+    #params <- c(10, 20, 30, 50, 100, 150, 200)
 
     cross.param <- do.call(rbind.cv,
                            lapply(params,
                                   function(param) {
-                                      model <- train(y = y.train,
+                                      model <- train(
+                                          y = y.train,
                                           x = x.train,
                                           method="rf",
                                           ntree=param,
@@ -76,33 +77,48 @@ cross.validation <- function(dat, target, k.fold) {
 
 if(sys.nframe() == 0) {
 
-    method <- "rf-full"
+    method <- "rf"
 
-    sites.lv <- c("es0118a", "es1438a",  # Madrid, Barcelona
-                  "es1625a", "es0890a",  # Valencia, Sevilla
-                  "es1047a", "es1137a",  # Zaragoza, Vigo
-                  "es1632a", "es0110a",  # Valladolid, Bilbao
-                  "es1580a", "es1340a"   # Santander, Huelva
-                  )
+    sites.cv <- list("es0118a" = c("no", "no2", "o3", "pm10", "pm2.5"),
+                     "es1438a" = c("no", "no2"),
+                     "es0890a" = c("no", "no2", "o3"),
+                     "es1047a" = c("no", "no2", "o3", "pm10"),
+                     "es1137a" = c("no", "no2", "o3", "pm10", "pm2.5"),
+                     "es0110a" = c("pm2.5"),
+                     "es1632a" = c("o3", "pm10"),
+                     "es1580a" = c("no", "no2", "pm10"),
+                     "es1340a" = c("pm10"),
+                     "es1938a" = c("pm2.5"),
+                     "es1239a" = c("no", "no2", "o3", "pm2.5"),
+                     "es1181a" = c("pm10"),
+                     "es1244a" = c("no", "no2", "pm10"),
+                     "es1631a" = c("no", "no2", "pm2.5"),
+                     "es1610a" = c("no", "no2", "o3", "pm10"),
+                     "es1635a" = c("o3"),
+                     "es1697a" = c("o3", "pm2.5"),
+                     "es1272a" = c("o3", "pm10", "pm2.5"),
+                     "es1096a" = c("pm2.5"),
+                     "es1492a" = c("pm2.5")
+                     )
 
-    all.df <- open.data(sites = sites.lv,
+    all.df <- open.data(sites = names(sites.cv),
                         end_dt = lubridate::ymd("2020-01-01"),
                         airQuality.fl = "data/full_data/data_AQ.rda",
                         meteo.fl = "data/full_data/meteorology.rda"
                         )
 
-    days <- 0:3
-    n.iqr <- 10
+    days <- 0
+    n.iqr <- 5
 
     cross.val <- list()
     init <- Sys.time()
 
     # Create one model for each pair of station-pollutant
-    for (st in sites.lv[1]) {
+    for (st in names(sites.cv)) {
         print(st)
         names.st <- names(all.df[[st]])
-        pollutants <- names.st[which(names.st %in% c("no", "no2", "pm10",
-                                                     "pm2.5", "o3"))]
+        pollutants <-sites.cv[[st]]
+
         for (pll in pollutants) {
             print(paste("", pll, sep="    "))
             for (dy in days) {
@@ -138,6 +154,6 @@ if(sys.nframe() == 0) {
     print(Sys.time()-init)
 
     save(cross.val,
-         file = paste("data/Cross-validation/cross_val/",
+         file = paste("data/Cross-validation/",
                       method, ".rda", sep=""))
 }
