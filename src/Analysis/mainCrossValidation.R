@@ -116,7 +116,6 @@ if(sys.nframe() == 0) {
     # Create one model for each pair of station-pollutant
     for (st in names(sites.cv)) {
         print(st)
-        names.st <- names(all.df[[st]])
         pollutants <-sites.cv[[st]]
 
         for (pll in pollutants) {
