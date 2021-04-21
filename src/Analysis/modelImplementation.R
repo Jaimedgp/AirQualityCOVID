@@ -73,11 +73,11 @@ comp.metrics <- function(obs, obs.ds=NA,
                                metrics),
                          data.frame(
                             qq.Mapping="Yes",
-                            "bias"=mean(pred.qq.ds) / mean(obs.ds),
-                            "var.ratio"=var(pred.qq.ds) / var(obs.ds),
-                            "cor1"=cor(pred.qq.ds, obs.ds),
+                            "bias"=mean(pred.qq) / mean(obs),
+                            "var.ratio"=var(pred.qq) / var(obs),
+                            "cor1"=cor(pred.qq, obs),
                             "cor2"=cor(pred.qq.ds, obs.ds),
-                            "RMSE"=sqrt(mean((pred.qq.ds - obs.ds)^2))
+                            "RMSE"=sqrt(mean((pred.qq - obs)^2))
                             )
                          )
     }
