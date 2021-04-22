@@ -50,8 +50,8 @@ cross.validation <- function(dat, target, k.fold) {
     date.test <- dat %>% select(date) %>% slice(k.fold$test)
 
     #params <- 0
-    params <- 1:10
-    #params <- c(10, 20, 30, 50, 100, 150, 200)
+    #params <- 1:10
+    params <- c(10, 20, 30, 50, 100, 150, 200)
 
     cross.param <- do.call(rbind.cv,
                            lapply(params,
@@ -149,10 +149,10 @@ if(sys.nframe() == 0) {
                     cross.val <- do.call(rbind.cv, list(cross.val, cross.row))
             }
         }
+
+        save(cross.val,
+            file = paste("data/Cross-validation/",
+                        method, ".rda", sep=""))
     }
     print(Sys.time()-init)
-
-    save(cross.val,
-         file = paste("data/Cross-validation/",
-                      method, ".rda", sep=""))
 }
