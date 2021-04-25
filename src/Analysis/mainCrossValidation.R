@@ -14,12 +14,9 @@ source("src/Analysis/preProcess.R")
 source("src/Analysis/modelImplementation.R")
 
 
-calc.metrics <- function(model, x.obs, y.obs, date) {
+calc.metrics <- function(model, x.obs, y.obs, x.ds.obs, y.ds.obs, date) {
 
     predictions <- qq.predict(model = model, x.obs = x.obs, y.obs = y.obs, date)
-
-    x.ds.obs <- apply(x.obs, 2, deseason.1D)
-    y.ds.obs <- deseason.1D(y.obs)
 
     predictions.ds <- qq.predict(model = model,
                                  x.obs = x.ds.obs, y.obs = y.ds.obs, date)
@@ -42,12 +39,23 @@ cross.validation <- function(dat, target, k.fold) {
     #
     # @params: omit.cl: columns to omit in the regression
 
+    date.test <- dat %>% select(date) %>% slice(k.fold$test)
+
+    dat.ds <- apply(dat %>% select(-date),
+                    2, deseason.1D) %>% data.frame()
+
     y.train <- dat[k.fold$train, target]
     x.train <- dat %>% select(-all_of(target), -date) %>% slice(k.fold$train)
     y.test <- dat[k.fold$test, target]
     x.test <- dat %>% select(-all_of(target), -date) %>% slice(k.fold$test)
 
-    date.test <- dat %>% select(date) %>% slice(k.fold$test)
+    if (!is.na(dat.ds)) {
+        y.ds.test <- dat.ds[k.fold$test, target]
+        x.ds.test <- dat.ds %>% select(-all_of(target)) %>% slice(k.fold$test)
+    }else {
+        y.ds.test <- NaN
+        x.ds.test <- NaN
+    }
 
     #params <- 0
     #params <- 1:10
@@ -68,6 +76,8 @@ cross.validation <- function(dat, target, k.fold) {
                                       cbind.cv(calc.metrics(model,
                                                             x.test,
                                                             y.test,
+                                                            x.ds.test,
+                                                            y.ds.test,
                                                             date.test),
                                                list(param=as.factor(param)))
                                   }))
@@ -154,5 +164,7 @@ if(sys.nframe() == 0) {
             file = paste("data/Cross-validation/",
                         method, ".rda", sep=""))
     }
+
     print(Sys.time()-init)
 }
+

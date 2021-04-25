@@ -28,7 +28,7 @@ deseason.1D <- function(cl, freq = 365) {
         cl[which(!is.na(cl))] <- as.vector(new.cl - dcomp$seasonal)
 
         return(cl)
-    } else { return(cl) }
+    } else {return(NaN) }
 }
 
 
@@ -94,7 +94,7 @@ un.range.1D <- function(cl, attri=NULL) {
 #         removed for all dataframe outside the function.
 #
 # @author Jaimedgp
-filter.IQR.1D <- function(cl, n, qntl=0.75) {
+filter.IQR.1D <- function(cl, n, qntl=0.7) {
 
     min.IQ <- quantile(cl, (1-qntl), na.rm=TRUE)
     max.IQ <- quantile(cl, qntl, na.rm=TRUE)

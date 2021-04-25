@@ -12,6 +12,10 @@
 
 qq.predict <- function(model, x.obs, y.obs, date, n.quantile=99, extrapolation="qwerty") {
 
+    if (is.na(x.obs)) {
+        return(data.frame(date=date, obs=NaN, pred=NaN, pred.qq=NaN))
+    }
+
     if ("lm" %in% class(model)) {
         train.outcome <- model$model[,1]
 
@@ -64,9 +68,12 @@ comp.metrics <- function(obs, obs.ds=NA,
     metrics <- data.frame("bias"=mean(pred) / mean(obs),
                           "var.ratio"=var(pred) / var(obs),
                           "cor1"=cor(pred, obs),
-                          "cor2"=cor(pred.ds, obs.ds),
+                          "cor2"=NaN,
                           "RMSE"=sqrt(mean((pred - obs)^2))
                           )
+    if (!is.na(pred.ds)) {
+        metrics$cor2 <- cor(pred.ds, obs.ds)
+    }
 
     if (sum(!is.na(pred.qq)) != 0) {
         metrics <- rbind(cbind(data.frame(qq.Mapping="No"),
@@ -76,10 +83,14 @@ comp.metrics <- function(obs, obs.ds=NA,
                             "bias"=mean(pred.qq) / mean(obs),
                             "var.ratio"=var(pred.qq) / var(obs),
                             "cor1"=cor(pred.qq, obs),
-                            "cor2"=cor(pred.qq.ds, obs.ds),
+                            "cor2"=NaN,
                             "RMSE"=sqrt(mean((pred.qq - obs)^2))
                             )
                          )
+        if (!is.na(pred.qq.ds)) {
+            metrics[metrics$qq.Mapping == "Yes", "cor2"] <- cor(pred.qq.ds,
+                                                                obs.ds)
+        }
     }
 
     return(data.frame(metrics))
