@@ -100,7 +100,7 @@ add.yesterday.meteo <- function(dat.df, n.days=1) {
                               by = "date",
                               all.x=T,
                               suffixes = c("", paste("", i, "before", sep="."))
-                              ) %>% slice(-1)
+                              )# %>% slice(-1)
     }
 
     return(yesterday.df)
