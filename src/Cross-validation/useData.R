@@ -46,8 +46,7 @@ open.data <- function(sites,
         mto <- data_Mto %>%
                     filter(site == nm,
                         date > start_dt,
-                        date < end_dt) %>%
-                    select(-atmos_pres)
+                        date < end_dt)
 
 
         dat.df <- merge(aq, mto,
