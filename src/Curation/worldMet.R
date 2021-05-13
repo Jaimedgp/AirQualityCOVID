@@ -72,12 +72,14 @@ if(sys.nframe() == 0) {
                 break
             } else {
                 data.Mto <- importNOAA(code = cd,
-                                year = years,
-                                hourly = TRUE,
-                                n.cores = 6
-                                ) %>%
-                            select("date", "code", "ws", "wd", "atmos_pres") %>%
-                            timeAverage(avg.time = "day", type="code")
+                                       year = years,
+                                       hourly = TRUE,
+                                       n.cores = 6
+                                       ) %>%
+                            select("date", "code", "ws", "wd") %>%
+                            timeAverage(avg.time = "day",
+                                        type="code",
+                                        vector.ws=FALSE)
 
                 if(sum(colSums(!is.na(data.Mto))/ period > min.proportion) == ncol(data.Mto)) {
                     mto[mto$code == cd, "siteAQ"] <- st

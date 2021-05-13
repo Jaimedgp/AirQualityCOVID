@@ -76,14 +76,14 @@ get.AQdata <- function(site, pollutant,
     } else {
         print("Downloading...")
 
-        suppressMessages(data.AQ <- get_saq_observations(
+        data.AQ <- get_saq_observations(
             site = site,
             variable = pollutant,
             start = start_dt,
             end = end_dt,
             valid_only = TRUE,
-            verbose = TRUE
-        ))
+            verbose = FALSE
+        )
     }
     data.AQ
 }

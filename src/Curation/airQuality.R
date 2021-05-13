@@ -75,7 +75,8 @@ get.sites <- function(type, area, start_dt,
                                date_start <= start_dt,
                                ) %>%
                         select(site, site_name, latitude, longitude, elevation,
-                               country, site_type, site_area, date_start, date_end)
+                               country, site_type, site_area,
+                               date_start, date_end)
 
     merge(x = spain.sites,
           y = sites.100mil,
@@ -200,8 +201,8 @@ main.curation <- function(pair.st.pll, study.prd, main.prd, minPercentage){
                             start_dt = study.prd[1], end_dt=study.prd[2])
 
         data.frame(site=site, Pollutant=pll,
-                   start_yr=as_date(min(dataAQPLL$date)),
-                   end_yr=as_date(max(dataAQPLL$date)),
+                   start_dt=as_date(min(dataAQPLL$date)),
+                   end_dt=as_date(max(dataAQPLL$date)),
                    hv.min, mss.wk, mss.mnth, mss.yr)
     }
 }
