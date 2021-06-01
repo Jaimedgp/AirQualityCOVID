@@ -9,24 +9,28 @@
 # @author Jaimedgp
 #################################################################
 
-suppressMessages(library(saqgetr))
-suppressMessages(library(lubridate))
+#suppressMessages(library(saqgetr))
+#suppressMessages(library(lubridate))
 
 
+#' data.as.datetime
+#'
+#' Converte date column into datetime format using lubridate package
+#'
+#' @param dataframe: dataframe with all data
+#' @param column: name or names of date column
+#' @param FUN: lubridate function to apply. Can be date ('ymd') or
+#'          datetime ('ymd <- hms')
+#'
+#' @return same dataframe with date column as datetime format
+#'
+#' @author Jaimedgp
 data.as.datetime <- function(dataframe, column, FUN){
-    # Converte date column into datetime format using lubridate package
-    #
-    # @params:
-    #     dataframe: dataframe with all data
-    #     column: name or names of date column
-    #     FUN: lubridate function to apply. Can be date ('ymd') or datetime ('ymd <- hms')
-    # @return:
-    #     dataframe: same dataframe with date column as datetime format
 
     if (FUN == "ymd_hms") {
-        dataframe[, column] <- ymd_hms(dataframe[, column])
+        dataframe[, column] <- lubridate::ymd_hms(dataframe[, column])
     } else if (FUN == "ymd") {
-        dataframe[, column] <- ymd(dataframe[, column])
+        dataframe[, column] <- lubridate::ymd(dataframe[, column])
     } else {
         print("No valid FUN. Must be: 'ymd_hms' or 'ymd'")
     }
@@ -34,26 +38,29 @@ data.as.datetime <- function(dataframe, column, FUN){
 }
 
 
+#' get.AQdata
+#'
+#' Obtain annual air quiality data. Data can be obtained either from
+#'     file with previous downloaded data or from saqgetr function
+#'
+#' @param site: site code for air quality station. e.g.: "es0000a"
+#' @param pollutant: pollutants from which to download
+#'          concentrations. e.g.: c("no2", "o3")
+#' @param start_dt: Start date for returned observations. if start_dt
+#'          is a date, its year is taken as start date.
+#' @param end_dt: End date for returned observations. if end_dt
+#'          is a date, its year is taken as end date.
+#' @param data.by.file: Boolean with the condition if the data
+#'          is taken from the file.
+#' @param fileName: Path of the downloaded data files from where the
+#'          data is loaded if data.by.file is true
+#'
+#' @return dataframe with air quality data
+#'
+#' @author Jaimedgp
 get.AQdata <- function(site, pollutant,
                        start_dt, end_dt=NA, data.by.file=FALSE,
                        fileName="data/Curation/AirQuality/Values/") {
-    # Obtain annual air quiality data. Data can be obtained either from
-    #     file with previous downloaded data or from saqgetr function
-    #
-    # @params:
-    #     site: site code for air quality station. e.g.: "es0000a"
-    #     pollutant: pollutants from which to download
-    #                concentrations. e.g.: c("no2", "o3")
-    #     start_dt: Start date for returned observations. if start_dt
-    #               is a date, its year is taken as start date.
-    #     end_dt: End date for returned observations. if end_dt
-    #             is a date, its year is taken as end date.
-    #     data.by.file: Boolean with the condition if the data
-    #                   is taken from the file.
-    #     fileName: Path of the downloaded data files from where the
-    #               data is loaded if data.by.file is true
-    # @return:
-    #     data.AQ: dataframe with air quality data
 
     fileName <- paste(fileName, site, ".csv", sep="")
 
@@ -69,14 +76,14 @@ get.AQdata <- function(site, pollutant,
                              read.csv(fl, stringsAsFactor=FALSE) %>%
                                 filter(variable %in% pollutant) %>%
                                 data.as.datetime("date", "ymd_hms") %>%
-                                filter(year(date) >= year(start_dt) &
-                                       year(date) <= year(end_dt))
+                                filter(lubridate::year(date) >= lubridate::year(start_dt) &
+                                       lubridate::year(date) <= lubridate::year(end_dt))
                             )
         }
     } else {
         print("Downloading...")
 
-        data.AQ <- get_saq_observations(
+        data.AQ <- saqgetr::get_saq_observations(
             site = site,
             variable = pollutant,
             start = start_dt,
@@ -85,18 +92,21 @@ get.AQdata <- function(site, pollutant,
             verbose = FALSE
         )
     }
-    data.AQ
+    data.AQ %>% mutate(value=ifelse(value<0, NaN, value))
 }
 
 
+#' sv.checkedAQ
+#'
+#' Download Air quality using checked_AQ information to download
+#'      only useful data. Save it in a .rda file
+#'
+#' @param fileName: Path to checked_AQ file
+#'
+#' @return dataframe with all air quality data
+#'
+#' @author Jaimedgp
 sv.checkedAQ <- function(start_dt, fileName="data/Curation/checked_AQ.csv") {
-    # Download Air quality using checked_AQ information to download
-    #      only useful data. Save it in a .rda file
-    #
-    # @params:
-    #     fileName: Path to checked_AQ file
-    # @return:
-    #     data_AQ: dataframe with all air quality data
 
     if (file.exists(fileName)) {
         sites.data <- read.csv(fileName, stringsAsFactor=F)
