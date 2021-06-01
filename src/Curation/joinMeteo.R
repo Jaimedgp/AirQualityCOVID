@@ -8,7 +8,7 @@
 
 # Load packages
 suppressMessages(library(tidyverse))
-suppressMessages(library(lubridate))
+#suppressMessages(library(lubridate))
 
 
 if(sys.nframe() == 0) {
@@ -24,8 +24,8 @@ if(sys.nframe() == 0) {
     #      Main Variables
     #--------------------------
 
-    start_dt <- ymd_hms("2013-01-01 00:00:00")
-    end_dt <- ymd_hms("2020-12-31 00:00:00")
+    start_dt <- lubridate::ymd_hms("2013-01-01 00:00:00")
+    end_dt <- lubridate::ymd_hms("2020-12-31 00:00:00")
 
 
     #-----------------------------
@@ -46,7 +46,7 @@ if(sys.nframe() == 0) {
     #       WorldMet Stations
     #-----------------------------
 
-    sites.WorldMet <- read.csv("data/Curation/checked_WorldMet.csv",
+    sites.noaa <- read.csv("data/Curation/checked_NOAA-ISD.csv",
                                stringsAsFactor=T)
 
 
@@ -61,11 +61,11 @@ if(sys.nframe() == 0) {
 
     for (st in levels(sites.AQ$site)) {
         nn.stations <- rbind(nn.stations,
-                            data.frame(siteAQ = as.factor(st),
-                                        AEMET = as.factor(sites.AEMET[sites.AEMET$siteAQ == st,
-                                                                    "indicativo"]),
-                                        WorldMet = sites.WorldMet[sites.WorldMet$siteAQ == st,
-                                                                "code"]
+                            data.frame("siteAQ" = as.factor(st),
+                                       "AEMET" = as.factor(sites.AEMET[sites.AEMET$siteAQ == st,
+                                                          "indicativo"]),
+                                       "noaa.ISD" = sites.noaa[sites.noaa$siteAQ == st,
+                                                                    "code"]
                                     )
                             )
     }
@@ -106,9 +106,9 @@ if(sys.nframe() == 0) {
     for (st in levels(nn.stations$siteAQ)) {
 
         if (st %in% names(ERA5.Land)) {
-            code <- nn.stations[nn.stations$siteAQ == st, "WorldMet"]
+            code <- nn.stations[nn.stations$siteAQ == st, "noaa.ISD"]
 
-            data.WorldMet <- read.csv(paste(Mto.files, "WorldMet/",
+            data.WorldMet <- read.csv(paste(Mto.files, "NOAA-ISD/",
                                         code, ".csv", sep=""), stringsAsFactor=F) %>%
                             data.as.datetime("date", "ymd") %>%
                             select(-"code")
