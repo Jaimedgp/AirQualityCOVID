@@ -13,10 +13,10 @@
 
 
 # Loading
-suppressMessages(library(worldmet))
 suppressMessages(library(tidyverse))
-suppressMessages(library(lubridate))
-suppressMessages(library(openair))
+#suppressMessages(library(worldmet))
+#suppressMessages(library(lubridate))
+#suppressMessages(library(openair))
 
 
 if(sys.nframe() == 0) {
@@ -31,12 +31,14 @@ if(sys.nframe() == 0) {
     min.proportion <- 0.8  # >80%
     years <- 2013:2020
 
-    study.prd <- c(ymd_hms("2013-01-01 00:00:00"),
-                   ymd_hms("2020-12-31 00:00:00"))
+    study.prd <- c(lubridate::ymd_hms("2013-01-01 00:00:00"),
+                   lubridate::ymd_hms("2020-12-31 00:00:00"))
 
-    period <- as.integer(interval(floor_date(study.prd[1], unit="day"),
-                                  floor_date(study.prd[2], unit="day")
-                                  ) / (3600*24)) + 2
+    period <- as.integer(lubridate::interval(lubridate::floor_date(study.prd[1],
+                                                                   unit="day"),
+                                             lubridate::floor_date(study.prd[2],
+                                                                   unit="day")
+                                             ) / (3600*24)) + 2
 
 
     #------------------------------
@@ -57,13 +59,13 @@ if(sys.nframe() == 0) {
 
     for (st in sites.lv) {
         print(st)
-        mto <- getMeta(lat = sites.AQ[sites.AQ$site == st, ]$latitude[1],
+        mto <- worldmet::getMeta(lat = sites.AQ[sites.AQ$site == st, ]$latitude[1],
                        lon = sites.AQ[sites.AQ$site == st, ]$longitude[1],
                        end.year = "current",
                        n = 7, returnMap = F)
 
         for (cd in mto[order(mto$dist), ]$code) {
-            fileName <- paste("data/Curation/WorldMet/", cd, ".csv", sep="")
+            fileName <- paste("data/Curation/NOAA-ISD/", cd, ".csv", sep="")
 
             if (file.exists(fileName)) {
                 mto[mto$code == cd, "siteAQ"] <- st
@@ -71,15 +73,15 @@ if(sys.nframe() == 0) {
 
                 break
             } else {
-                data.Mto <- importNOAA(code = cd,
-                                       year = years,
-                                       hourly = TRUE,
-                                       n.cores = 6
+                data.Mto <- worldmet::importNOAA(code = cd,
+                                                 year = years,
+                                                 hourly = TRUE,
+                                                 n.cores = 12
                                        ) %>%
                             select("date", "code", "ws", "wd") %>%
-                            timeAverage(avg.time = "day",
-                                        type="code",
-                                        vector.ws=FALSE)
+                            openair::timeAverage(avg.time = "day",
+                                                 type="code",
+                                                 vector.ws=FALSE)
 
                 if(sum(colSums(!is.na(data.Mto))/ period > min.proportion) == ncol(data.Mto)) {
                     mto[mto$code == cd, "siteAQ"] <- st
@@ -99,5 +101,5 @@ if(sys.nframe() == 0) {
     #------------------------------
 
     write.csv(sites.Mto,
-              "data/Curation/checked_WorldMet.csv", row.names=FALSE)
+              "data/Curation/checked_NOAA-ISD.csv", row.names=FALSE)
 }
