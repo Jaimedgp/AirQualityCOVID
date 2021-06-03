@@ -11,6 +11,7 @@
 
 #suppressMessages(library(saqgetr))
 #suppressMessages(library(lubridate))
+suppressMessages(library(dplyr))
 
 
 #' data.as.datetime
@@ -63,19 +64,18 @@ get.AQdata <- function(site, pollutant,
                        fileName="data/Curation/AirQuality/Values/") {
 
     fileName <- paste(fileName, site, ".csv", sep="")
+    if (is.na(end_dt)) {
+        end_dt <- Sys.Date()
+    }
 
     if (data.by.file & sum(file.exists(fileName)) == length(site)) {
         data.AQ <- data.frame()
-
-        if (is.na(end_dt)) {
-            end_dt <- Sys.Date()
-        }
 
         for (fl in fileName) {
             data.AQ <- rbind(data.AQ,
                              read.csv(fl, stringsAsFactor=FALSE) %>%
                                 filter(variable %in% pollutant) %>%
-                                data.as.datetime("date", "ymd_hms") %>%
+                                data.as.datetime("date", "ymd") %>%
                                 filter(lubridate::year(date) >= lubridate::year(start_dt) &
                                        lubridate::year(date) <= lubridate::year(end_dt))
                             )
@@ -90,9 +90,18 @@ get.AQdata <- function(site, pollutant,
             end = end_dt,
             valid_only = TRUE,
             verbose = FALSE
-        )
+        )  %>%
+            mutate(value=ifelse(value<0, NA, value))
+
+        if (nrow(data.AQ) > 0) {
+            data.AQ <- data.AQ %>%
+                        openair::timeAverage(avg.time = "day",
+                                             type=c("variable", "site"))
+        }
     }
-    data.AQ %>% mutate(value=ifelse(value<0, NaN, value))
+
+
+    data.AQ %>% mutate(value=ifelse(value<=0, NA, value))
 }
 
 
@@ -106,7 +115,7 @@ get.AQdata <- function(site, pollutant,
 #' @return dataframe with all air quality data
 #'
 #' @author Jaimedgp
-sv.checkedAQ <- function(start_dt, fileName="data/Curation/checked_AQ.csv") {
+sv.checkedAQ <- function(start_dt, end_dt, fileName="data/Curation/checked_AQ.csv") {
 
     if (file.exists(fileName)) {
         sites.data <- read.csv(fileName, stringsAsFactor=F)
@@ -114,10 +123,14 @@ sv.checkedAQ <- function(start_dt, fileName="data/Curation/checked_AQ.csv") {
 
         for (st in levels(as.factor(sites.data$site))) {
             pll <- levels(as.factor(sites.data[sites.data$site == st,
-                                    "Pollutant"]))
+                                    "variable"]))
+
             data_AQ <- rbind(data_AQ,
-                              get.AQdata(st, pollutant=pll, start_dt=start_dt)
-                              )
+                             get.AQdata(st, pollutant=pll,
+                                        start_dt=start_dt, end_dt=end_dt) %>%
+                                select(date, site, variable, value) %>%
+                                data.frame
+                             )
         }
         save(data_AQ, file="data/data_AQ.rda")
     } else {
