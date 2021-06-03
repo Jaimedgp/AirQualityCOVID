@@ -175,7 +175,7 @@ get.missing <- function(dataFrame, unit="week",
 #'
 #' @return dataframe with the relevant information in each column
 #'     - site: air quality station code
-#'     - Pollutant: pollutant code
+#'     - variable: pollutant code
 #'     - start_yr: date of beginning of data collection of the pollutant
 #'                 for each station
 #'     - end_yr: date of ending of data collection of the pollutant
@@ -210,7 +210,7 @@ main.curation <- function(pair.st.pll, study.prd, main.prd, minPercentage){
         mss.yr <- get.missing(dataAQPLL, unit="year",
                             start_dt = study.prd[1], end_dt=study.prd[2])
 
-        data.frame(site=site, Pollutant=pll,
+        data.frame(site=site, variable=pll,
                    start_dt=lubridate::as_date(min(dataAQPLL$date)),
                    end_dt=lubridate::as_date(max(dataAQPLL$date)),
                    hv.min, mss.wk, mss.mnth, mss.yr)
@@ -230,8 +230,8 @@ if(sys.nframe() == 0) {
     site_type <- "traffic"
     site_area <- "urban"
 
-    start_dt <- lubridate::ymd_hms("2013-01-01 00:00:00")
-    end_dt <- lubridate::ymd_hms("2020-12-30 00:00:00")
+    start_dt <- lubridate::ymd("2013-01-01")
+    end_dt <- lubridate::ymd("2020-12-30")
 
     pollutants <- c("no", "no2", "o3", "pm10", "pm2.5")
 
@@ -248,8 +248,8 @@ if(sys.nframe() == 0) {
     #------------------------------
 
     hv.min.percent <- 0.8 # data > 80%
-    main.prd <- c(lubridate::ymd_hms("2020-03-01 00:00:00"),
-                  lubridate::ymd_hms("2020-06-30 00:00:00"))
+    main.prd <- c(lubridate::ymd("2020-03-01"),
+                  lubridate::ymd("2020-06-30"))
 
     sites.lv <- levels(as.factor(sites.AQ$site))
     pairs.st.pll <- do.call(rbind,
@@ -282,7 +282,7 @@ if(sys.nframe() == 0) {
                            mss.yr < 5)
 
     checked_sitesAQ <- merge(x = valid.info %>%
-                                  select(site, Pollutant),
+                                  select(site, variable),
                              y = sites.AQ,
                              by = "site", all.x = T, all.y=F)
 
