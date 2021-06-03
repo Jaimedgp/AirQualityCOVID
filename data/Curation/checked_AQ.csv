@@ -1,4 +1,4 @@
-"site","Pollutant","site_name","latitude","longitude","elevation","country","site_type","site_area","date_start","date_end","Municipio","Población","Estación.tráfico"
+"site","variable","site_name","latitude","longitude","elevation","country","site_type","site_area","date_start","date_end","Municipio","Población","Estación.tráfico"
 "es0041a","no2","DIRECCIÓN DE SALUD",43.25883,-2.94565,32,"spain","traffic","urban",1986-04-01 00:00:00,2021-05-10 18:00:00,"Bilbao",346843,"María Diaz de Haro"
 "es0041a","pm10","DIRECCIÓN DE SALUD",43.25883,-2.94565,32,"spain","traffic","urban",1986-04-01 00:00:00,2021-05-10 18:00:00,"Bilbao",346843,"María Diaz de Haro"
 "es0110a","no","ERANDIO",43.30268,-2.97724,4,"spain","traffic","urban",1997-01-01 00:00:00,2021-05-10 19:00:00,"Bilbao",346843,"Erandio"
