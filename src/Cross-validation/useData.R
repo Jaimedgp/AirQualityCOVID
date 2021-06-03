@@ -103,9 +103,9 @@ add.yesterday.meteo <- function(dat.df, n.days=1) {
 
         yesterday.df <- merge(yesterday.df, new.df,
                               by = by.col,
-                              all.x=F, all.y=T,
+                              all.x=F, all.y=F,
                               suffixes = c("", paste("", i, "before", sep="."))
-                              )# %>% slice(-1)
+                              )
     }
 
     return(yesterday.df)
