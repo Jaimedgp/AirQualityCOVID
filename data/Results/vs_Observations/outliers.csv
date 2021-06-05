@@ -1,29 +1,23 @@
 "variable","Municipio","periods","mean","latitude","longitude"
-"no","Burgos","fases",57.4489250522456,42.35083,-3.67556
-"no","Castellón de la Plana","fases",-1.53214120904754,39.98888888,-0.02611111
-"o3","Lleida","fases",-14.8440134566438,41.615794867,0.615725897
-"o3","Palma","fases",17.9995227355997,39.57008,2.65583
-"o3","Pamplona","fases",-15.4586406066641,42.81222,-1.64
-"pm10","Ourense","fases",22.8032064896438,42.353,-7.8779
-"pm2.5","Las Palmas de Gran Canaria","fases",493.601779450717,28.133732,-15.432823
-"pm2.5","Valencia","fases",-38.8291347735475,39.4649074066667,-0.388611106666667
-"no","Burgos","lockdown",13.2967961578498,42.35083,-3.67556
-"no","Castellón de la Plana","lockdown",-11.5030126342325,39.98888888,-0.02611111
-"no","Valladolid","lockdown",-25.5830538075712,41.6320370333333,-4.73916666
-"no","Burgos","new.lockdown",45.4971555633719,42.35083,-3.67556
-"no","Zaragoza","new.lockdown",13.8498948915085,41.646805,-0.889025
-"no2","Almería","new.lockdown",-7.26569548631268,36.84133,-2.44672
-"no2","Marbella","new.lockdown",-49.3827712458241,36.511,-4.863
-"no2","Málaga","new.lockdown",7.52711488696269,36.7073,-4.446
-"no2","Santander","new.lockdown",-63.5082197671361,43.46056,-3.80861
-"no2","Zaragoza","new.lockdown",-2.56435182532273,41.6473133333333,-0.887313333333333
-"o3","Vigo","new.lockdown",-21.5475775481967,42.219,-8.7421
-"pm2.5","Las Palmas de Gran Canaria","new.lockdown",31.7293407186015,28.133732,-15.432823
-"no","Burgos","normalidad",69.6135448264578,42.35083,-3.67556
-"no2","Santander","normalidad",-49.7570261645023,43.46056,-3.80861
-"o3","Vigo","normalidad",-23.4281877336117,42.219,-8.7421
-"pm10","Las Palmas de Gran Canaria","normalidad",16.9324529408359,28.133732,-15.432823
-"pm10","Ourense","normalidad",30.8926645529311,42.353,-7.8779
-"pm10","Valladolid","normalidad",41.4673076476926,41.625277775,-4.743611105
-"pm2.5","Las Palmas de Gran Canaria","normalidad",180.226497409479,28.133732,-15.432823
-"pm2.5","Las Palmas de Gran Canaria","pre lockdown",141.609849143876,28.133732,-15.432823
+"no","Burgos","Confinamiento",13.2967961578498,42.35083,-3.67556
+"no","Castellón de la Plana","Confinamiento",-11.5030126342325,39.98888888,-0.02611111
+"no","Valladolid","Confinamiento",-25.5830538075712,41.6320370333333,-4.73916666
+"no","Burgos","Fases",57.4489250522456,42.35083,-3.67556
+"no","Castellón de la Plana","Fases",-1.53214120904754,39.98888888,-0.02611111
+"pm10","Ourense","Fases",22.8032064896438,42.353,-7.8779
+"pm2.5","Valencia","Fases",-38.8291347735475,39.4649074066667,-0.388611106666667
+"no","Burgos","Nueva Normalidad",69.6135448264578,42.35083,-3.67556
+"no2","Santander","Nueva Normalidad",-49.7570261645023,43.46056,-3.80861
+"o3","Vigo","Nueva Normalidad",-23.4281877336117,42.219,-8.7421
+"pm10","Ourense","Nueva Normalidad",30.8926645529311,42.353,-7.8779
+"pm10","Valladolid","Nueva Normalidad",41.4673076476926,41.625277775,-4.743611105
+"pm2.5","Ourense","Nueva Normalidad",-36.9036143916746,42.353,-7.8779
+"no","Burgos","Segundo Estado de Alarma",45.4971555633719,42.35083,-3.67556
+"no","Zaragoza","Segundo Estado de Alarma",13.8498948915085,41.646805,-0.889025
+"no2","Marbella","Segundo Estado de Alarma",-49.3827712458241,36.511,-4.863
+"no2","Málaga","Segundo Estado de Alarma",7.52711488696269,36.7073,-4.446
+"no2","Santander","Segundo Estado de Alarma",-63.5082197671361,43.46056,-3.80861
+"no2","Zaragoza","Segundo Estado de Alarma",-2.56435182532273,41.6473133333333,-0.887313333333333
+"o3","Almería","Segundo Estado de Alarma",8.17388087010003,36.84133,-2.44672
+"o3","Castellón de la Plana","Segundo Estado de Alarma",-0.67772947724902,39.98888888,-0.02611111
+"o3","Vigo","Segundo Estado de Alarma",-21.5475775481967,42.219,-8.7421
