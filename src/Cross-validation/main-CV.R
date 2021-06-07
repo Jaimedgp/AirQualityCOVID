@@ -5,8 +5,8 @@ suppressMessages(library(caret))
 
 setwd("~/Repositories/AirQualityCOVID/")
 
+source("src/preprocess.R")
 source("src/Cross-validation/cv-utilities.R")
-source("src/Cross-validation/preprocess.R")
 
 
 #' cross.validation
