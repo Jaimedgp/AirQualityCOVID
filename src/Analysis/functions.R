@@ -74,8 +74,8 @@ group.municipio <- function(data,
 
     merge(data,
           sites.lv,
-          by = "site", all.x=TRUE) %>%
-        group_by(variable, Municipio, periods) %>%
+          by = c("site", "variable"), all.x=TRUE) %>%
+        group_by(variable, Municipio, periods, type) %>%
         summarise(mean = mean(mean, na.rm=T),
                   latitude = mean(latitude),
                   longitude = mean(longitude)

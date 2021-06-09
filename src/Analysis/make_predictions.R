@@ -5,10 +5,9 @@ source("src/preprocess.R")
 
 
 pairs <- read.csv("data/Curation/checked_AQ.csv") %>%
-            select(site, Pollutant) %>%
+            select(site, variable) %>%
             filter(site != "es1573a") %>%
-            mutate(names=paste(site, Pollutant, sep="-"))
-
+            mutate(names=paste(site, variable, sep="-"))
 
 data.df <- open.data(pairs[,1],
                      aq.file = "data/all/data_AQ.rda",
@@ -20,8 +19,6 @@ train.df <- data.df %>%
                 filter(date < lubridate::ymd("2020-01-01"))
 to.predict.df <- data.df %>%
                 filter(date >= lubridate::ymd("2020-01-01"))
-
-
 
 predictions <- data.frame()
 
