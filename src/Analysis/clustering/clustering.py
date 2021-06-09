@@ -28,7 +28,7 @@ def replace_nan(time_serie):
 def open_data(file="data/Results/predictions_municipios.csv"):
     """ Open file and pivot table """
 
-    data = pd.read_csv(file)
+    data = pd.read_csv(file).drop(["pred", "obs"], axis=1)
 
     data["date"] = pd.to_datetime(data["date"])
 
@@ -50,6 +50,7 @@ if __name__ == '__main__':
     data_df = open_data(HOME+"data/Results/predictions_municipios.csv")
 
     data_df = min_max_scaler(data_df)
+    data_df = filter_municipio("Marbella")
 
     data_df = data_df.apply(replace_nan).droplevel(None, axis=1)
 

@@ -1,6 +1,7 @@
 library(tidyverse)
 
 setwd("~/Repositories/AirQualityCOVID/")
+source("src/preprocess.R")
 source("src/Analysis/functions.R")
 
 data.df <- merge(read.csv("data/Results/predictions.csv"),
@@ -13,7 +14,9 @@ data.df <- merge(read.csv("data/Results/predictions.csv"),
             summarise(obs = mean(obs, na.rm=T),
                       pred = mean(pred, na.rm=T)
                      ) %>%
-            mutate(diff = relative.change(obs, pred))
+            mutate(diff = relative.change(obs, pred)) %>%
+            mutate(diff=filter.IQR.1D(diff, 5))
+
 
 write.csv(data.df,
           "data/Results/predictions_municipios.csv",
