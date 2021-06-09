@@ -21,46 +21,31 @@
 "o3","Almería","Segundo Estado de Alarma","hist",8.17388087010004,36.84133,-2.44672
 "o3","Castellón de la Plana","Segundo Estado de Alarma","hist",-0.677729477249023,39.98888888,-0.02611111
 "o3","Vigo","Segundo Estado de Alarma","hist",-21.5475775481967,42.219,-8.7421
-"no","Alcobendas","Confinamiento","pred",215.626550620789,40.540351,-3.645253
-"no","Burgos","Confinamiento","pred",35.8031300899667,42.35083,-3.67556
-"no","Castellón de la Plana","Confinamiento","pred",-40.1365966223601,39.98888888,-0.02611111
-"no","Valladolid","Confinamiento","pred",-103.569910498625,41.6320370333333,-4.73916666
-"no2","Burgos","Confinamiento","pred",-34.1254753985443,42.35083,-3.67556
-"o3","Pamplona","Confinamiento","pred",-4.51779480469363,42.81222,-1.64
-"no","Alicante","Fases","pred",92.3850899439834,38.35944444,-0.47194444
-"no","Burgos","Fases","pred",-131.152607022036,42.35083,-3.67556
-"no","Gijón","Fases","pred",51.0382406176206,43.535425,-5.6692
-"no","Granada","Fases","pred",-145.936300892614,37.1961,-3.61266
-"no","Ourense","Fases","pred",38.2622825220462,42.353,-7.8779
-"no","Palma","Fases","pred",-159.841160975425,39.57008,2.65583
-"no","Sevilla","Fases","pred",5728.87124962886,37.389385,-5.98136
-"no2","Huelva","Fases","pred",50.6823076795537,37.25336,-6.93514
-"no2","San Sebastián","Fases","pred",-224.637849834137,43.3157,-1.9858
-"pm10","Ourense","Fases","pred",36.1844102200269,42.353,-7.8779
-"pm2.5","Valencia","Fases","pred",-46.3709897277046,39.4649074066667,-0.388611106666667
-"pm2.5","Vigo","Fases","pred",20.7537487540468,42.219,-8.7421
-"no","Burgos","Nueva Normalidad","pred",1905.8222296265,42.35083,-3.67556
-"no","Castellón de la Plana","Nueva Normalidad","pred",-166.537754969342,39.98888888,-0.02611111
-"no","Elche","Nueva Normalidad","pred",-1276.44287583767,38.25916666,-0.7175
-"no","Leganés","Nueva Normalidad","pred",-265.736894001596,40.3397,-3.7545
-"no","Oviedo","Nueva Normalidad","pred",302.496395616564,43.3624,-5.8497
-"no","Palma","Nueva Normalidad","pred",-169.863313109909,39.57008,2.65583
-"no","Pamplona","Nueva Normalidad","pred",-213.431425421798,42.81222,-1.64
-"no","Vigo","Nueva Normalidad","pred",-167.796192081163,42.219,-8.7421
-"no2","Castellón de la Plana","Nueva Normalidad","pred",-59.5569301032921,39.98888888,-0.02611111
-"no2","Leganés","Nueva Normalidad","pred",1.09796689315075,40.3397,-3.7545
-"no2","Lleida","Nueva Normalidad","pred",-65.16905642239,41.615794867,0.615725897
-"no2","Málaga","Nueva Normalidad","pred",0.183656498331488,36.7073,-4.446
-"no2","Santander","Nueva Normalidad","pred",-46.7253311670783,43.46056,-3.80861
-"o3","Vigo","Nueva Normalidad","pred",-31.9108572240189,42.219,-8.7421
-"pm10","Ourense","Nueva Normalidad","pred",24.1213479201799,42.353,-7.8779
-"pm10","Valladolid","Nueva Normalidad","pred",26.2239867525817,41.625277775,-4.743611105
-"pm2.5","Ourense","Nueva Normalidad","pred",37.2763056316228,42.353,-7.8779
-"o3","Gijón","pre Confinamiento","pred",22.0528280158372,43.535425,-5.6692
-"pm2.5","Valladolid","pre Confinamiento","pred",46.0734951167902,41.637777775,-4.73541666
-"no","Burgos","Segundo Estado de Alarma","pred",121.708531127007,42.35083,-3.67556
-"no","Málaga","Segundo Estado de Alarma","pred",290.27963002526,36.7073,-4.446
-"no2","Alicante","Segundo Estado de Alarma","pred",89.7712757234637,38.35944444,-0.47194444
-"no2","Málaga","Segundo Estado de Alarma","pred",12.3667925383706,36.7073,-4.446
-"no2","Santander","Segundo Estado de Alarma","pred",-60.717400274094,43.46056,-3.80861
-"o3","Vigo","Segundo Estado de Alarma","pred",-40.1084139352702,42.219,-8.7421
+"no","Burgos","Confinamiento","pred",84.7552661332939,42.35083,-3.67556
+"no2","Burgos","Confinamiento","pred",-12.8603114762306,42.35083,-3.67556
+"no2","León","Confinamiento","pred",-33.7238630612028,42.60388888,-5.58722222
+"no2","Valladolid","Confinamiento","pred",-35.4331540567151,41.6320370333333,-4.73916666
+"o3","Barcelona","Confinamiento","pred",73.1409389510875,41.3920432675,2.153603542
+"pm2.5","Valencia","Confinamiento","pred",-32.9066854525039,39.4649074066667,-0.388611106666667
+"no","Burgos","Fases","pred",108.139875850171,42.35083,-3.67556
+"no2","Vigo","Fases","pred",4.0743940397972,42.219,-8.7421
+"o3","Gijón","Fases","pred",26.3484804699629,43.535425,-5.6692
+"pm10","Ourense","Fases","pred",91.5953083079388,42.353,-7.8779
+"pm2.5","Valencia","Fases","pred",-38.7457583724947,39.4649074066667,-0.388611106666667
+"no","Burgos","Nueva Normalidad","pred",125.396083992166,42.35083,-3.67556
+"no2","Burgos","Nueva Normalidad","pred",26.5793884074219,42.35083,-3.67556
+"o3","Vigo","Nueva Normalidad","pred",-31.4649621967797,42.219,-8.7421
+"pm10","Ourense","Nueva Normalidad","pred",47.7712442950106,42.353,-7.8779
+"pm2.5","Gijón","Nueva Normalidad","pred",23.2791290254053,43.5299,-5.6735
+"pm2.5","Ourense","Nueva Normalidad","pred",-17.7458298835233,42.353,-7.8779
+"pm2.5","San Sebastián","Nueva Normalidad","pred",8.19921989181237,43.3157,-1.9858
+"no2","Burgos","pre Confinamiento","pred",24.7410844211397,42.35083,-3.67556
+"o3","Gijón","pre Confinamiento","pred",57.2409811139032,43.535425,-5.6692
+"o3","Oviedo","pre Confinamiento","pred",60.9068029422854,43.3624,-5.8497
+"pm10","Burgos","pre Confinamiento","pred",74.2250126176737,42.35083,-3.67556
+"pm10","Zaragoza","pre Confinamiento","pred",-24.5011995289209,41.646805,-0.889025
+"no","Burgos","Segundo Estado de Alarma","pred",125.579194097832,42.35083,-3.67556
+"no2","Burgos","Segundo Estado de Alarma","pred",13.1675642225802,42.35083,-3.67556
+"no2","Málaga","Segundo Estado de Alarma","pred",12.6054888916262,36.7073,-4.446
+"no2","Oviedo","Segundo Estado de Alarma","pred",-46.2084526914233,43.3624,-5.8497
+"no2","Santander","Segundo Estado de Alarma","pred",-61.3575777192441,43.46056,-3.80861
