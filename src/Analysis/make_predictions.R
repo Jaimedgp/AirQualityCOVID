@@ -38,6 +38,14 @@ for (i in 1:nrow(pairs)) {
 
     pred <- predict(model, newdata = slice.to.predict)
 
+    pred <- downscaleR:::eqm(slice.train$value,
+                             predict(model),
+                             pred,
+                             n.quantile=99,
+                             precip=FALSE, pr.threshold=0,
+                             extrapolation="qwerty"
+                            )
+
     predictions <- rbind(predictions,
                          data.frame(site=pairs[i, 1],
                                     variable=pairs[i, 2],
