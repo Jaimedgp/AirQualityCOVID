@@ -7,6 +7,32 @@
 ########################################################################
 
 
+#' deseason.1D
+#'
+#' Remove seasonal component of the additive time serie.
+#'
+#' @param cl: numeric vector with additive time serie. Must have at least
+#'          two periods of length.
+#' @param freq: period of seasonality. Default: 365 corresponds to one
+#'          natural year in dialy resolution
+#'
+#' @return vector with time serie less its seasonal component. If there
+#'          is not enough data to deseasonal, return cl vector
+#'
+#' @author Jaimedgp
+deseason.1D <- function(cl, freq = 365) {
+
+    if (length(cl) > 2*freq) {
+        new.cl <- na.omit(cl)
+        dcomp <- decompose(ts(new.cl, frequency = freq))
+
+        cl[which(!is.na(cl))] <- as.vector(new.cl - dcomp$seasonal)
+
+        return(cl)
+    } else {return(NaN) }
+}
+
+
 #' leave.year.out
 #'
 #' fold date values into years, substraction one year for test and using

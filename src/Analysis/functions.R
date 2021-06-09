@@ -68,13 +68,13 @@ sep.periods <- function(data, periods) {
 #' @return dataframe with the mean of each municipio
 #'
 #' @author Jaimedgp
-group.municipio <- function(data.df,
+group.municipio <- function(data,
                             filename="data/Curation/checked_AQ.csv") {
     sites.lv <- read.csv(filename)
 
-    merge(data.df,
+    merge(data,
           sites.lv,
-          by = c("site", "variable"), all.x=TRUE) %>%
+          by = "site", all.x=TRUE) %>%
         group_by(variable, Municipio, periods) %>%
         summarise(mean = mean(mean, na.rm=T),
                   latitude = mean(latitude),
