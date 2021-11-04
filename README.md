@@ -1,4 +1,4 @@
-# Estimating changes in air pollutant levels due to COVID-19 lockdown measures based on a business-as-usual prediction scenario using data mining models: A case-study for urban traffic sites in Spain.
+# Estimating changes in air pollutant levels due to COVID-19 lockdown measures
 
 This repository contains all the script developed to the study of the changes in air pollutant
 levels due to COVID-19 lockdown measures. The repository includes jupyter notebooks with examples
