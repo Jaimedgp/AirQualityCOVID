@@ -9,62 +9,63 @@
 
 
 from datetime import date
+from pyaemet import AemetClima
 
 import pandas as pd
 
-from meteo.AEMET import DownloadAEMET
-from meteo.apikey_file import apikey
-from meteo.curation import download_nearest_data
 
+if __name__ == '__main__':
 
-# Define Home directory
-HOME = "/home/jaimedgp/Repositories/AirQualityCOVID/"
-# Initialize AEMET API class with my api key
-Aemet = DownloadAEMET(apikey=apikey)
+    # Define Home directory
+    HOME = "/home/jaimedgp/Repositories/AirQualityCOVID/"
 
-# ------------------------------
-#      Air Quality sites
-# ------------------------------
+    # ------------------------------
+    #      Air Quality sites
+    # ------------------------------
 
-sites_AQ = pd.read_csv(HOME+"data/Curation/checked_AQ.csv")
+    sites_AQ = pd.read_csv(HOME+"data/curation/checked_AQ.csv")
 
-unique_sites_AQ = sites_AQ.groupby(["site",
-                                    "latitude",
-                                    "longitude"]
-                                    ).size().reset_index()
+    unique_sites_AQ = sites_AQ.groupby(["site",
+                                        "latitude",
+                                        "longitude"]
+                                        ).size().reset_index()
 
-# ------------------------------
-#      Curation Variables
-# ------------------------------
+    # ------------------------------
+    #      Curation Variables
+    # ------------------------------
 
-study_prd = [date(2013, 1, 1), date(2020, 12, 31)]
-NUM_STATIONS = 10
-MIN_PROPORTION = 0.8
+    start_date, end_date = date(2013, 1, 1), date(2020, 12, 31)
+    NUM_STATIONS = 10
+    MIN_PROPORTION = 0.8
 
-folder_vl = HOME+"data/Curation/AEMET/"
+    folder_vl = HOME+"data/curation/AEMET/"
 
-removed_cl = ["sol", "horatmin", "horatmax", "horaracha",
-              "dir", "velmedia", "horaPresMax", "horaPresMin"]
-selected_cl = ["fecha", "tmed", "prec",
-               "tmin", "tmax", "presMax", "presMin"]
+    selected_cl = ["fecha", "tmed", "prec",
+                   "tmin", "tmax", "presMax", "presMin"]
 
-# ------------------------------
-#      Curation Process
-# ------------------------------
+    # ------------------------------
+    #      Curation Process
+    # ------------------------------
 
-all_station_info = [download_nearest_data(aemet=Aemet, siteAQ=row,
-                                          stdy_prd=study_prd,
-                                          remove_cl=removed_cl,
-                                          selected_cl=selected_cl,
-                                          folder=folder_vl, n=NUM_STATIONS,
-                                          min_prop=MIN_PROPORTION)
-                    for i, row in unique_sites_AQ.iterrows()]
+    apikey = ""
 
-# ------------------------------
-#      Save Curated data
-# ------------------------------
+    # Initialize AEMET API class with my api key
+    aemet = AemetClima(apikey=apikey)
+    aemet_sites = pd.DataFrame()
 
-file_st = HOME+"data/Curation/checked_AEMET.csv"
+    for i, row in unique_sites_AQ.iterrows():
+        nearest_site = aemet.estaciones_curacion(latitud=row["latitude"],
+                                                 longitud=row["longitude"],
+                                                 n_cercanas=NUM_STATIONS,
+                                                 fecha_ini=start_date,
+                                                 fecha_end=end_date,
+                                                 umbral=MIN_PROPORTION,
+                                                 variables=selected_cl,
+                                                 save_folder=folder_vl)
 
-pd.concat(all_station_info,
-          axis=0, ignore_index=True).to_csv(file_st, index=False)
+        if not isinstance(nearest_site, bool):
+            nearest_site["siteAQ"] = row["site"]
+
+            aemet_sites = pd.concat([aemet_sites, nearest_site])
+    else:
+        aemet_sites.to_csv(HOME+"data/curation/checked_AEMET.csv")
