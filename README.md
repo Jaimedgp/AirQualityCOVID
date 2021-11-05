@@ -19,7 +19,7 @@ pip install -i https://test.pypi.org/simple/ pyAEMET-Jaimedgp
 ## DataSet
 
 The data used in the study are publicly accessible in a persistent data repository in
-[https://zenodo.org/deposit/5642868](https://zenodo.org/deposit/5642868) and we encourage to
+[10.5281/zenodo.5642868](10.5281/zenodo.5642868) and we encourage to
 download and include in the same directory of this repository for reproduction.
 
 ```
