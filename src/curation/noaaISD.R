@@ -22,7 +22,8 @@ suppressMessages(library(tidyverse))
 if(sys.nframe() == 0) {
 
     print("Executing main...")
-    setwd("~/Repositories/AirQualityCOVID")
+    # set the repository directory as working directory
+    setwd("AirQualityCOVID/")
 
     #--------------------------
     #      Main Variables
@@ -45,7 +46,7 @@ if(sys.nframe() == 0) {
     #      sites Information
     #------------------------------
 
-    sites.AQ <- read.csv("data/Curation/checked_AQ.csv",
+    sites.AQ <- read.csv("data/curation/checked_AQ.csv",
                          stringsAsFactor=TRUE)
 
     sites.lv <- levels(sites.AQ$site)
@@ -65,7 +66,7 @@ if(sys.nframe() == 0) {
                        n = 7, returnMap = F)
 
         for (cd in mto[order(mto$dist), ]$code) {
-            fileName <- paste("data/Curation/NOAA-ISD/", cd, ".csv", sep="")
+            fileName <- paste("data/curation/NOAA-ISD/", cd, ".csv", sep="")
 
             if (file.exists(fileName)) {
                 mto[mto$code == cd, "siteAQ"] <- st
@@ -101,5 +102,5 @@ if(sys.nframe() == 0) {
     #------------------------------
 
     write.csv(sites.Mto,
-              "data/Curation/checked_NOAA-ISD.csv", row.names=FALSE)
+              "data/curation/checked_NOAA-ISD.csv", row.names=FALSE)
 }

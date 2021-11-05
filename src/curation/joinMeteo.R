@@ -14,7 +14,8 @@ suppressMessages(library(tidyverse))
 if(sys.nframe() == 0) {
 
     print("Executing main...")
-    setwd("~/Repositories/AirQualityCOVID")
+    # set the repository directory as working directory
+    setwd("AirQualityCOVID/")
 
     # Source some scripts
     source("src/functions.R")
@@ -32,21 +33,21 @@ if(sys.nframe() == 0) {
     #    Air Quality Stations
     #-----------------------------
 
-    sites.AQ <- read.csv("data/Curation/checked_AQ.csv",
+    sites.AQ <- read.csv("data/curation/checked_AQ.csv",
                          stringsAsFactor=T)
 
     #-----------------------------
     #       AEMET Stations
     #-----------------------------
 
-    sites.AEMET <- read.csv("data/Curation/checked_AEMET.csv",
+    sites.AEMET <- read.csv("data/curation/checked_AEMET.csv",
                             stringsAsFactor=F, colClasses=c("indicativo"="character"))
 
     #-----------------------------
     #       WorldMet Stations
     #-----------------------------
 
-    sites.noaa <- read.csv("data/Curation/checked_NOAA-ISD.csv",
+    sites.noaa <- read.csv("data/curation/checked_NOAA-ISD.csv",
                                stringsAsFactor=T)
 
 
@@ -75,7 +76,7 @@ if(sys.nframe() == 0) {
     #    ERA5-Land Data
     #-----------------------------
 
-    folder.ERA5.Land <- "data/Curation/ERA5-Land/"
+    folder.ERA5.Land <- "data/curation/ERA5-Land/"
 
     # Relative Humidity
     load(paste(folder.ERA5.Land,
@@ -99,7 +100,7 @@ if(sys.nframe() == 0) {
     #-----------------------------
 
     # Folder wherever take downloaded data, if it exists
-    Mto.files <- "data/Curation/"
+    Mto.files <- "data/curation/"
 
     data_Mto <- data.frame()
 
@@ -145,4 +146,9 @@ if(sys.nframe() == 0) {
     #------------------------------
 
     save(data_Mto, nn.stations, file="data/meteorology.rda")
+
+    write.csv(nn.stations,
+              "data/curation/nn_stations.csv", row.names=FALSE)
+    write.csv(data_Mto,
+              "data/meteorology.csv", row.names=FALSE)
 }

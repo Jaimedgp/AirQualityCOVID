@@ -17,7 +17,7 @@ import pandas as pd
 if __name__ == '__main__':
 
     # Define Home directory
-    HOME = "/home/jaimedgp/Repositories/AirQualityCOVID/"
+    HOME = "AirQualityCOVID/"
 
     # ------------------------------
     #      Air Quality sites

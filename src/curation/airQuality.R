@@ -23,8 +23,6 @@ suppressMessages(library(plyr))
 #suppressMessages(require(openxlsx))
 #suppressMessages(require(openair))
 
-setwd("~/Repositories/AirQualityCOVID")
-
 source.file <- "functions.R"
 if (!file.exists(source.file)) {
     source.file <- paste("src/", source.file, sep="")
@@ -194,7 +192,7 @@ main.curation <- function(pair.st.pll, study.prd, main.prd, minPercentage){
     dataAQPLL <- get.AQdata(site=site, pollutant=pll,
                             start_dt = study.prd[1], end_dt=study.prd[2],
                             data.by.file=TRUE,
-                            fileName="data/Curation/AirQuality/Values/")
+                            fileName="data/curation/AirQuality/")
 
     if (nrow(dataAQPLL) > 0) {
 
@@ -221,7 +219,8 @@ main.curation <- function(pair.st.pll, study.prd, main.prd, minPercentage){
 if(sys.nframe() == 0) {
 
     print("Executing main...")
-    setwd("~/Repositories/AirQualityCOVID")
+    # set the repository directory as working directory
+    setwd("AirQualityCOVID/")
 
     #--------------------------
     #      Main Variables
@@ -240,7 +239,7 @@ if(sys.nframe() == 0) {
     #------------------------------
 
     sites.AQ <- get.sites(site_type, site_area, start_dt,
-                          file.es="data/xlsx/estaciones-CA-JA.xlsx",
+                          file.es="data/curation/estaciones-CA-JA.xlsx",
                           sheets="ciudades-100000-A")
 
     #------------------------------
@@ -291,7 +290,7 @@ if(sys.nframe() == 0) {
     #------------------------------
 
     write.csv(checked_sitesAQ,
-              "data/Curation/checked_AQ.csv", row.names=FALSE)
+              "data/curation/checked_AQ.csv", row.names=FALSE)
 
-    sv.data <- sv.checkedAQ(start_dt, "data/Curation/checked_AQ.csv")
+    sv.data <- sv.checkedAQ(start_dt, "data/curation/checked_AQ.csv")
 }

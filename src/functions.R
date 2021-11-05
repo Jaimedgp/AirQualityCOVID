@@ -133,6 +133,8 @@ sv.checkedAQ <- function(start_dt, end_dt, fileName="data/Curation/checked_AQ.cs
                              )
         }
         save(data_AQ, file="data/data_AQ.rda")
+        write.csv(data_AQ,
+                  "data/data_AQ.csv", row.names=FALSE)
     } else {
         data_AQ <- NULL
     }
