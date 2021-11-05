@@ -23,6 +23,6 @@ for (mth in methodes) {
 
 cv.results <- all.cv
 save(cv.results,
-     file = "data/cross-validation/final.rda")
+     file = "data/cross-validation/cv-results.rda")
 write.csv(cv.results,
-          "data/cross-validation/final.csv", row.names=FALSE)
+          "data/cross-validation/cv-results.csv", row.names=FALSE)
