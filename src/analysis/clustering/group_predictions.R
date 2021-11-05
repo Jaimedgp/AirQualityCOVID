@@ -1,11 +1,11 @@
 library(tidyverse)
 
-setwd("~/Repositories/AirQualityCOVID/")
+setwd("AirQualityCOVID/")
 source("src/preprocess.R")
-source("src/Analysis/functions.R")
+source("src/analysis/functions.R")
 
-data.df <- merge(read.csv("data/Results/predictions.csv"),
-                 read.csv("data/Curation/checked_AQ.csv"),
+data.df <- merge(read.csv("data/results/predictions.csv"),
+                 read.csv("data/curation/checked_AQ.csv"),
                  by = c("site", "variable"),
                  all.x = T, all.y=F
                 ) %>%
@@ -19,5 +19,5 @@ data.df <- merge(read.csv("data/Results/predictions.csv"),
 
 
 write.csv(data.df,
-          "data/Results/predictions_municipios.csv",
+          "data/results/predictions_municipios.csv",
           row.names=F)

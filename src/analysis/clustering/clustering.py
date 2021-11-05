@@ -25,7 +25,7 @@ def replace_nan(time_serie):
     return time_serie
 
 
-def open_data(file="data/Results/predictions_municipios.csv"):
+def open_data(file="data/results/predictions_municipios.csv"):
     """ Open file and pivot table """
 
     data = pd.read_csv(file).drop(["pred", "obs"], axis=1)
@@ -45,18 +45,17 @@ def filter_municipio(data, municipios):
 
 
 if __name__ == '__main__':
-    HOME = "/home/jaimedgp/Repositories/AirQualityCOVID/"
+    HOME = "AirQualityCOVID/"
 
-    data_df = open_data(HOME+"data/Results/predictions_municipios.csv")
+    data_df = open_data(HOME+"data/results/predictions_municipios.csv")
 
     data_df = min_max_scaler(data_df)
-    data_df = filter_municipio("Marbella")
+    data_df = filter_municipio(data_df, "Marbella")
 
     data_df = data_df.apply(replace_nan).droplevel(None, axis=1)
 
-    serie = to_time_series_dataset(data_df.T.to_numpy(
-        ).reshape(data_df.shape[1],
-                  data_df.shape[0], 1))
+    serie = to_time_series_dataset(
+        data_df.T.to_numpy().reshape(data_df.shape[1], data_df.shape[0], 1))
 
     model = TimeSeriesKMeans(n_clusters=4,
                              metric="euclidean",
@@ -78,4 +77,4 @@ if __name__ == '__main__':
                             pd.DataFrame({"group": i+1,
                                           "Municipio": grp_sites})])
 
-    groups.to_csv(HOME+"data/Clustering/groups.csv", index=False)
+    groups.to_csv(HOME+"data/clustering/groups.csv", index=False)
