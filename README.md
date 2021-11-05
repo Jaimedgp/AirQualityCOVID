@@ -6,9 +6,15 @@ and results of the development of the study.
 
 Anyone interested in the analysis are encouraged to contact Jaime Diez: jaime.diez.gp@gmail.com
 
-## Abstract
+## pyAEMET
 
-In response to the COVID-19 pandemic, governments declared severe restrictions throughout 2020, presenting an unprecedented scenario of reduced anthropogenic emissions of air pollutants derived mainly from traffic sources. To analyse the effect of the COVID-19 pandemic on air quality levels, changes in NO, NO2, O3, PM10 and PM2.5 concentrations were estimated at urban traffic sites in the most populated Spanish cities over different periods with distinct restrictions in 2020. Three different data mining techniques plus a quantile-quantile mapping correction have been used to estimate the business-as-usual concentrations in 2020 and to account for meteorological variability. The results obtained show a decreasing pattern for NOx, with the largest reduction in the lockdown period above -50%, whereas the increase observed for O3 contrasts with the NOx patterns with a maximum increase of 23.9%. The slight reduction in PM10 (-4.1%) and PM2.5 levels (-2.3%) during lockdown indicates a lower relationship with traffic sources.
+During the course of this research the [pyaemet](https://github.com/Jaimedgp/pyAEMET) python library
+has been developed in order to download AEMET clima data via its OpenData API REST and it is needed
+to execute the AEMET curation process
+
+```bash
+pip install -i https://test.pypi.org/simple/ pyAEMET-Jaimedgp
+```
 
 ## DataSet
 
