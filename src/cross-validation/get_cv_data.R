@@ -1,16 +1,16 @@
 suppressMessages(library(tidyverse))
 
 # Working directory
-setwd("~/Repositories/AirQualityCOVID")
+setwd("AirQualityCOVID/")
 
-source("src/Cross-validation/cv-utilities.R")
-source("src/Cross-validation/preprocess.R")
+source("src/cross-validation/cv-utilities.R")
+source("src/cross-validation/preprocess.R")
 
 methodes <- c("lm", "glm", "knn", "rf")
 all.cv <- list()
 
 for (mth in methodes) {
-    load(paste("data/Cross-validation/", mth, ".rda", sep=""))
+    load(paste("data/cross-validation/", mth, ".rda", sep=""))
     print(mth)
 
     all.cv <- do.call(rbind.cv,
@@ -23,4 +23,6 @@ for (mth in methodes) {
 
 cv.results <- all.cv
 save(cv.results,
-     file = "data/Cross-validation/final.rda")
+     file = "data/cross-validation/final.rda")
+write.csv(cv.results,
+          "data/cross-validation/final.csv", row.names=FALSE)

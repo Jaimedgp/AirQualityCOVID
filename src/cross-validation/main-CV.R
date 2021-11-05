@@ -3,10 +3,10 @@ suppressMessages(library(caret))
 #suppressMessages(library(doMC))
 #registerDoMC(cores=as.integer(detectCores()*0.75))
 
-setwd("~/Repositories/AirQualityCOVID/")
+setwd("AirQualityCOVID/")
 
 source("src/preprocess.R")
-source("src/Cross-validation/cv-utilities.R")
+source("src/cross-validation/cv-utilities.R")
 
 
 #' cross.validation
@@ -125,8 +125,8 @@ if(sys.nframe() == 0) {
                                function (x) t(mapply(c, sites.cv[[x]], x))))
 
     data.df <- open.data(sites.cv[,2],
-                         aq.file = "data/all/data_AQ.rda",
-                         meteo.file = "data/all/meteorology.rda") %>%
+                         aq.file = "data/data_AQ.rda",
+                         meteo.file = "data/meteorology.rda") %>%
                     filter(date < lubridate::ymd("2020-01-01"))
 
     #-----------------------
@@ -162,7 +162,7 @@ if(sys.nframe() == 0) {
                                          days=as.factor(dy)))
             cv.results <- do.call(rbind.cv, list(cv.results, results))
             save(cv.results,
-                    file = paste("~/Repositories/AirQualityCOVID/data/Cross-validation/", method, ".rda", sep=""))
+                    file = paste("data/cross-validation/", method, ".rda", sep=""))
         }
     }
     print(Sys.time()-init)
