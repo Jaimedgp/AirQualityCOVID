@@ -69,7 +69,7 @@ sep.periods <- function(data, periods) {
 #'
 #' @author Jaimedgp
 group.municipio <- function(data,
-                            filename="data/Curation/checked_AQ.csv") {
+                            filename="data/curation/checked_AQ.csv") {
     sites.lv <- read.csv(filename)
 
     merge(data,

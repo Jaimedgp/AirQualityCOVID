@@ -1,17 +1,17 @@
 suppressMessages(library(tidyverse))
 
-setwd("~/Repositories/AirQualityCOVID/")
+setwd("AirQualityCOVID/")
 source("src/preprocess.R")
 
 
-pairs <- read.csv("data/Curation/checked_AQ.csv") %>%
+pairs <- read.csv("data/curation/checked_AQ.csv") %>%
             select(site, variable) %>%
             filter(site != "es1573a") %>%
             mutate(names=paste(site, variable, sep="-"))
 
 data.df <- open.data(pairs[,1],
-                     aq.file = "data/all/data_AQ.rda",
-                     meteo.file = "data/all/meteorology.rda") %>%
+                     aq.file = "data/data_AQ.rda",
+                     meteo.file = "data/meteorology.rda") %>%
                 add.yesterday.meteo(n.days = 3) %>%
                 filter(site != "es1573a")
 
@@ -57,5 +57,4 @@ for (i in 1:nrow(pairs)) {
 
 
 write.csv(predictions,
-          "data/Results/predictions.csv",
-          row.names=F)
+          "data/results/predictions.csv", row.names=F)
