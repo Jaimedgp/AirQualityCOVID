@@ -13,7 +13,7 @@ has been developed in order to download AEMET clima data via its OpenData API RE
 to execute the AEMET curation process
 
 ```bash
-pip install -i https://test.pypi.org/simple/ pyAEMET-Jaimedgp
+pip install pyaemet=1.0.1
 ```
 
 ## DataSet
