@@ -1,10 +1,10 @@
 # Estimating changes in air pollutant levels due to COVID-19 lockdown measures
 
-This repository contains all the script developed to the study of the changes in air pollutant
-levels due to COVID-19 lockdown measures. The repository includes jupyter notebooks with examples
-and results of the development of the study.
+This repository contains all the scripts developed for the study of the changes in air pollutant
+levels due to COVID-19 lockdown measures. The repository includes Jupyter notebooks with worked examples
+and illustrative results.
 
-Anyone interested in the analysis are encouraged to contact Jaime Diez: jaime.diez.gp@gmail.com
+Anyone interested in the analysis is encouraged to contact Jaime Diez: jaime.diez.gp@gmail.com
 
 ## pyAEMET
 
@@ -18,7 +18,7 @@ pip install pyaemet=1.0.1
 
 ## DataSet
 
-The data used in the study are publicly accessible in a persistent data repository in
+The data used in the study are publicly available through a persistent data repository in
 [10.5281/zenodo.5642868](https://doi.org/10.5281/zenodo.5642868) and we encourage to
 download and include in the same directory of this repository for reproduction.
 
@@ -32,7 +32,7 @@ AirQualityCOVID
     +---notebook/
 ```
 
-## Founding
+## Funding
 
 This research was developed in the framework of the project “Contaminación atmosférica y
 COVID-19: ¿Qué podemos aprender de esta pandemia?”, selected in the Extraordinary BBVA
