@@ -1,6 +1,6 @@
-# Estimating changes in air pollutant levels due to COVID-19 lockdown measures
+# Estimating changes in air pollutant levels due to COVID-19 lockdown measures in Spain
 
-This repository contains all the code developed for the article _Estimating changes in air pollutant levels due to COVID-19 lockdown measures based on a business-as-usual prediction scenario using data mining models: A case-study for urban traffic sites in Spain (2021)_ by J. Díez et al., which has been submitted to _Environmental Software & Modelling_. For the sake of reproducibility, it includes Jupyter notebooks with worked examples which allow to reproduce the results shown in that paper.
+This repository contains all the code developed for the article _"Estimating changes in air pollutant levels due to COVID-19 lockdown measures based on a business-as-usual prediction scenario using data mining models: A case-study for urban traffic sites in Spain"_, submitted to _Environmental Software & Modelling_ by J. Díez et al. (2021). For the sake of reproducibility, it includes Jupyter notebooks with worked examples which allow to reproduce the results shown in that paper.
 
 Contact: jaime.diez.gp@gmail.com
 
