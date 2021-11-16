@@ -30,6 +30,6 @@ AirQualityCOVID
 ## Funding
 
 This research was developed in the framework of the project “Contaminación atmosférica y
-COVID-19: ¿Qué podemos aprender de esta pandemia?”, funded through the Extraordinary BBVA
-Foundation grant call for SARS-CoV-2 and COVID-19 research proposals within the area of
+COVID-19: ¿Qué podemos aprender de esta pandemia?”, selected in the Extraordinary BBVA
+Foundation grant call for SARS-CoV-2 and COVID-19 research proposals, within the area of
 ecology and veterinary science.
